@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>이력서 데이터 관리 (Profile Editor)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+    <style>
+        body { background-color: #f4f6f9; padding-bottom: 100px; }
+        .section-card { border: none; border-radius: 12px; transition: transform 0.2s; }
+        /* 드래그 핸들 스타일 */
+        .drag-handle, .drag-handle-root { cursor: grab; color: #adb5bd; }
+        .drag-handle:active, .drag-handle-root:active { cursor: grabbing; color: #495057; }
+
+        .list-item, .project-item, .meta-item, .tech-item { transition: background-color 0.2s; }
+        .sortable-ghost { opacity: 0.4; background-color: #e9ecef !important; border: 2px dashed #ced4da; }
+
+        /* 중첩 리스트 시각적 구분 */
+        .project-sortable-list { min-height: 10px; }
+        .solution-sortable-list, .impact-sortable-list { min-height: 5px; }
+    </style>
+</head>
+<body class="container py-5">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold text-primary"><i class="bi bi-person-lines-fill"></i> 이력서 데이터 관리</h1>
+    <a href="/" class="btn btn-outline-secondary" target="_blank">내 이력서 보기 <i class="bi bi-box-arrow-up-right"></i></a>
+</div>
+
+<div th:if="${param.saved}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+    <strong><i class="bi bi-check-circle-fill"></i> 저장 완료!</strong> 모든 변경사항이 반영되었습니다.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<form th:action="@{/admin/profile/save}" th:object="${wrapper}" method="post" id="profileForm">
+
+    <div id="mainSectionList" class="sortable-list-root">
+
+        <div th:each="sec, secStat : *{sections}" class="section-card mb-4 bg-white shadow-sm p-4 list-item-root position-relative">
+
+            <div class="section-header d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-arrows-move drag-handle-root fs-4 me-3" title="순서 변경"></i>
+                    <h4 class="mb-0 fw-bold text-dark"
+                        th:text="${secStat.count + '. ' + (sec.sectionName != null ? sec.sectionName : sec.sectionType)}">
+                        1. 섹션명
+                    </h4>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-light text-secondary border me-2">SECTION VISIBILITY</span>
+                    <div class="form-check form-switch fs-5 mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                               th:checked="${sec.visible}"
+                               onchange="this.nextElementSibling.value = this.checked"
+                               title="이 섹션을 이력서에 표시할지 설정합니다.">
+                        <input type="hidden" th:field="*{sections[__${secStat.index}__].visible}">
+                    </div>
+                </div>
+
+                <input type="hidden" th:if="${sec.id != null}" th:field="*{sections[__${secStat.index}__].id}">
+                <input type="hidden" th:field="*{sections[__${secStat.index}__].sectionName}">
+                <input type="hidden" th:field="*{sections[__${secStat.index}__].sectionType}">
+                <input type="hidden" class="root-sort-order" th:field="*{sections[__${secStat.index}__].sortOrder}">
+            </div>
+
+            <div th:if="${sec.sectionType.name() == 'ABOUT'}">
+                <div class="row g-3">
+                    <input type="hidden" th:field="*{config.id}">
+                    <div class="col-md-6"><label class="form-label fw-bold text-muted small">이름</label><input type="text" th:field="*{config.fullName}" class="form-control" placeholder="홍길동"></div>
+                    <div class="col-md-6"><label class="form-label fw-bold text-muted small">직무 타이틀</label><input type="text" th:field="*{config.companyRoleLabel}" class="form-control" placeholder="Backend Developer"></div>
+                    <div class="col-md-4"><label class="form-label text-muted small">전화번호</label><input type="text" th:field="*{config.phone}" class="form-control"></div>
+                    <div class="col-md-4"><label class="form-label text-muted small">이메일</label><input type="email" th:field="*{config.email}" class="form-control"></div>
+                    <div class="col-md-4"><label class="form-label text-muted small">링크 (GitHub/Blog)</label><input type="text" th:field="*{config.github}" class="form-control"></div>
+                    <div class="col-12"><label class="form-label fw-bold text-muted small">자기소개 본문</label><textarea th:field="*{config.aboutParagraph}" class="form-control" rows="4"></textarea></div>
+                </div>
+                <div class="mt-4">
+                    <label class="form-label fw-bold mb-2">📌 주요 경험 요약 (Key Experience)</label>
+                    <div id="keyRoleList" class="sortable-list">
+                        <div th:each="role, rStat : *{keyRoles}" class="list-item d-flex align-items-center mb-2">
+                            <i class="bi bi-grip-vertical drag-handle me-2"></i>
+                            <input type="hidden" th:field="*{keyRoles[__${rStat.index}__].id}">
+                            <input type="hidden" class="sort-order" th:field="*{keyRoles[__${rStat.index}__].sortOrder}">
+                            <input type="hidden" th:field="*{keyRoles[__${rStat.index}__].visible}">
+                            <div class="flex-grow-1 me-2"><textarea th:field="*{keyRoles[__${rStat.index}__].roleContent}" class="form-control form-control-sm" rows="1"></textarea></div>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeElement(this)"><i class="bi bi-x"></i></button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-link px-0 text-decoration-none" onclick="addKeyRole()"><i class="bi bi-plus-circle"></i> 경험 한 줄 추가</button>
+                </div>
+            </div>
+
+            <div th:if="${sec.sectionType.name() == 'PROJECTS'}">
+                <div id="companyList" class="sortable-list">
+                    <div th:each="comp, cStat : *{companies}" class="list-item bg-light border p-3 mb-4 rounded-3">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-grip-vertical drag-handle fs-4 me-2"></i>
+                            <input type="hidden" th:field="*{companies[__${cStat.index}__].id}">
+                            <input type="hidden" class="sort-order" th:field="*{companies[__${cStat.index}__].sortOrder}">
+                            <input type="hidden" th:field="*{companies[__${cStat.index}__].visible}">
+                            <div class="flex-grow-1 me-3"><input type="text" th:field="*{companies[__${cStat.index}__].name}" class="form-control fw-bold fs-5" placeholder="회사명"></div>
+                            <div class="mx-3 border-start ps-3 d-flex align-items-center">
+                                <span class="badge bg-secondary me-2">TYPE</span>
+                                <div class="form-check form-check-inline mb-0">
+                                    <input class="form-check-input company-type-radio" type="radio" th:name="'companyType-' + ${cStat.index}" value="WORK" th:checked="${#lists.isEmpty(comp.projects) or comp.projects[0].type == null or comp.projects[0].type.toString() == 'WORK'}"><label class="form-check-label small">WORK</label>
+                                </div>
+                                <div class="form-check form-check-inline mb-0">
+                                    <input class="form-check-input company-type-radio" type="radio" th:name="'companyType-' + ${cStat.index}" value="PERSONAL" th:checked="${!#lists.isEmpty(comp.projects) and comp.projects[0].type != null and comp.projects[0].type.toString() == 'PERSONAL'}"><label class="form-check-label small">PERSONAL</label>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch" title="회사 노출 여부"><input class="form-check-input" type="checkbox" th:checked="${comp.visible}" onchange="this.previousElementSibling.value = this.checked"></div>
+                            <button type="button" class="btn btn-outline-danger btn-sm ms-3" onclick="removeElement(this)">삭제</button>
+                        </div>
+
+                        <div th:id="'projectList-' + ${cStat.index}" class="project-sortable-list bg-white p-3 rounded border shadow-sm">
+                            <div th:each="proj, pStat : ${comp.projects}" class="project-item border-bottom pb-4 mb-4">
+                                <div class="d-flex align-items-center mb-2 bg-light p-2 rounded">
+                                    <i class="bi bi-grip-vertical drag-handle me-2 text-secondary"></i>
+                                    <span class="badge bg-primary me-2">PROJECT</span>
+                                    <input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].id}">
+                                    <input type="hidden" class="project-sort-order" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].sortOrder}">
+                                    <input type="hidden" th:name="|companies[${cStat.index}].projects[${pStat.index}].type|" th:value="${proj.type != null ? proj.type : 'WORK'}">
+                                    <input type="text" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].title}" class="form-control fw-bold border-0 bg-transparent" placeholder="프로젝트명">
+
+                                    <div class="form-check form-switch ms-2">
+                                        <input class="form-check-input" type="checkbox" th:checked="${proj.visible}" onchange="this.nextElementSibling.value = this.checked">
+                                        <input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].visible}">
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="removeElement(this)"><i class="bi bi-trash"></i></button>
+                                </div>
+
+                                <div th:id="'metaList-' + ${cStat.index} + '-' + ${pStat.index}" class="meta-sortable-list ps-3 border-start ms-2">
+                                    <div th:each="meta, mStat : ${proj.metaItems}" class="meta-item mb-3 bg-white border rounded p-2">
+                                        <input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].id}">
+                                        <input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].itemType}">
+                                        <input type="hidden" class="meta-sort-order" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].sortOrder}">
+
+                                        <div class="d-flex align-items-center mb-2 border-bottom pb-1">
+                                            <i class="bi bi-grip-horizontal drag-handle me-2"></i>
+                                            <span class="badge bg-light text-dark border me-auto" th:text="${meta.itemType}"></span>
+                                            <div class="form-check form-switch form-check-sm">
+                                                <input class="form-check-input" type="checkbox" th:checked="${meta.visible}" onchange="this.nextElementSibling.value = this.checked">
+                                                <input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].visible}">
+                                            </div>
+                                        </div>
+
+                                        <div th:if="${meta.itemType.toString() == 'DURATION'}"><input type="text" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].content}" class="form-control form-control-sm border-0" placeholder="기간"></div>
+                                        <div th:if="${meta.itemType.toString() == 'SUMMARY'}"><textarea th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].content}" class="form-control form-control-sm border-0" rows="2" placeholder="요약"></textarea></div>
+                                        <div th:if="${meta.itemType.toString() == 'TECH_STACK_GROUP'}">
+                                            <div th:id="'techList-' + ${cStat.index} + '-' + ${pStat.index} + '-' + ${mStat.index}" class="tech-sortable-list d-flex flex-wrap gap-2">
+                                                <div th:each="stack, tStat : ${meta.techStacks}" class="tech-item input-group input-group-sm w-auto">
+                                                    <span class="input-group-text bg-light border-0 px-1 drag-handle">::</span>
+                                                    <input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].techStacks[__${tStat.index}__].id}">
+                                                    <input type="hidden" class="tech-sort-order" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].techStacks[__${tStat.index}__].sortOrder}">
+                                                    <input type="text" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].techStacks[__${tStat.index}__].techName}" class="form-control" placeholder="기술">
+                                                    <div class="input-group-text bg-white border-start-0 ps-1"><input class="form-check-input mt-0" type="checkbox" th:checked="${stack.visible}" onchange="this.nextElementSibling.value=this.checked"><input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].techStacks[__${tStat.index}__].visible}"></div>
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="removeElement(this)">x</button>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-link p-0 mt-2" th:onclick="'addTechStack(' + ${cStat.index} + ',' + ${pStat.index} + ',' + ${mStat.index} + ')'">+ 기술</button>
+                                        </div>
+                                        <div th:if="${meta.itemType.toString() == 'CONTENT_GROUP'}">
+                                            <div th:id="'probList-' + ${cStat.index} + '-' + ${pStat.index} + '-' + ${mStat.index}">
+                                                <div th:each="prob, probStat : ${meta.problems}" class="mb-3 ps-3 border-start border-3 border-light">
+                                                    <div class="mb-2 d-flex">
+                                                        <input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].problems[__${probStat.index}__].id}">
+                                                        <input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].problems[__${probStat.index}__].sortOrder}">
+                                                        <input type="text" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].problems[__${probStat.index}__].title}" class="form-control form-control-sm fw-bold bg-light" placeholder="문제 정의">
+                                                        <button type="button" class="btn btn-xs btn-link text-danger ms-2" onclick="removeElement(this)"><i class="bi bi-trash"></i></button>
+                                                    </div>
+                                                    <div th:id="'solList-' + ${cStat.index} + '-' + ${pStat.index} + '-' + ${mStat.index} + '-' + ${probStat.index}" class="solution-sortable-list ps-3 mb-1">
+                                                        <div th:each="sol, solStat : ${prob.solutions}" class="solution-item input-group input-group-sm mb-1">
+                                                            <span class="input-group-text bg-white border-0 px-1 drag-handle" style="cursor:move;">::</span>
+                                                            <input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].problems[__${probStat.index}__].solutions[__${solStat.index}__].id}">
+                                                            <input type="hidden" class="solution-sort-order" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].problems[__${probStat.index}__].solutions[__${solStat.index}__].sortOrder}">
+                                                            <input type="text" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].problems[__${probStat.index}__].solutions[__${solStat.index}__].content}" class="form-control" placeholder="해결책">
+                                                            <div class="input-group-text bg-white border-start-0 ps-1"><input class="form-check-input mt-0" type="checkbox" th:checked="${sol.visible}" onchange="this.nextElementSibling.value=this.checked"><input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].problems[__${probStat.index}__].solutions[__${solStat.index}__].visible}"></div>
+                                                            <button type="button" class="btn btn-outline-light text-danger border-0" onclick="removeElement(this)">x</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="ps-4 mb-2"><button type="button" class="btn btn-xs btn-light text-primary py-0" th:onclick="'addSolution(' + ${cStat.index} + ',' + ${pStat.index} + ',' + ${mStat.index} + ',' + ${probStat.index} + ')'">+ 해결</button></div>
+                                                    <div th:id="'impList-' + ${cStat.index} + '-' + ${pStat.index} + '-' + ${mStat.index} + '-' + ${probStat.index}" class="impact-sortable-list ps-3">
+                                                        <div th:each="imp, impStat : ${prob.impacts}" class="impact-item input-group input-group-sm mb-1">
+                                                            <span class="input-group-text bg-white border-0 px-1 drag-handle" style="cursor:move;">::</span>
+                                                            <input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].problems[__${probStat.index}__].impacts[__${impStat.index}__].id}">
+                                                            <input type="hidden" class="impact-sort-order" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].problems[__${probStat.index}__].impacts[__${impStat.index}__].sortOrder}">
+                                                            <input type="text" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].problems[__${probStat.index}__].impacts[__${impStat.index}__].content}" class="form-control" placeholder="성과">
+                                                            <div class="input-group-text bg-white border-start-0 ps-1"><input class="form-check-input mt-0" type="checkbox" th:checked="${imp.visible}" onchange="this.nextElementSibling.value=this.checked"><input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].problems[__${probStat.index}__].impacts[__${impStat.index}__].visible}"></div>
+                                                            <button type="button" class="btn btn-outline-light text-danger border-0" onclick="removeElement(this)">x</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="ps-4"><button type="button" class="btn btn-xs btn-light text-success py-0" th:onclick="'addImpact(' + ${cStat.index} + ',' + ${pStat.index} + ',' + ${mStat.index} + ',' + ${probStat.index} + ')'">+ 성과</button></div>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary w-100 mt-2" th:onclick="'addProblem(' + ${cStat.index} + ',' + ${pStat.index} + ',' + ${mStat.index} + ')'">+ 에피소드</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-end mt-3"><button type="button" class="btn btn-primary btn-sm" th:onclick="'addFullProject(' + ${cStat.index} + ')'">+ 프로젝트 추가</button></div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm mt-3" onclick="addCompany()">+ 경력(회사) 추가</button>
+            </div>
+
+            <div th:if="${sec.sectionType.name() == 'EDUCATION'}">
+                <div id="eduList" class="sortable-list">
+                    <div th:each="edu, stat : *{educations}" class="list-item d-flex align-items-start mb-3 border-bottom pb-2">
+                        <i class="bi bi-grip-vertical drag-handle mt-2 me-2"></i>
+                        <input type="hidden" th:field="*{educations[__${stat.index}__].id}">
+                        <input type="hidden" class="sort-order" th:field="*{educations[__${stat.index}__].sortOrder}">
+                        <input type="hidden" th:field="*{educations[__${stat.index}__].visible}">
+                        <div class="row g-2 flex-grow-1">
+                            <div class="col-md-4"><input type="text" th:field="*{educations[__${stat.index}__].institution}" class="form-control fw-bold" placeholder="학교"></div>
+                            <div class="col-md-3"><input type="text" th:field="*{educations[__${stat.index}__].period}" class="form-control" placeholder="기간"></div>
+                            <div class="col-md-3"><input type="text" th:field="*{educations[__${stat.index}__].major}" class="form-control" placeholder="전공"></div>
+                            <div class="col-md-2"><input type="text" th:field="*{educations[__${stat.index}__].gpa}" class="form-control" placeholder="학점"></div>
+                            <div class="col-12"><textarea th:field="*{educations[__${stat.index}__].additionalInfo}" class="form-control bg-light form-control-sm" rows="1"></textarea></div>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger btn-sm ms-3" onclick="removeElement(this)">X</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm mt-3" onclick="addEducation()">+ 학력 추가</button>
+            </div>
+
+            <div th:if="${sec.sectionType.name() == 'CERTIFICATION'}">
+                <div id="certList" class="sortable-list">
+                    <div th:each="cert, stat : *{certifications}" class="list-item d-flex align-items-center mb-3 border-bottom pb-2">
+                        <i class="bi bi-grip-vertical drag-handle me-2"></i>
+                        <input type="hidden" th:field="*{certifications[__${stat.index}__].id}">
+                        <input type="hidden" class="sort-order" th:field="*{certifications[__${stat.index}__].sortOrder}">
+                        <input type="hidden" th:field="*{certifications[__${stat.index}__].visible}">
+                        <div class="row g-2 flex-grow-1">
+                            <div class="col-md-6"><input type="text" th:field="*{certifications[__${stat.index}__].name}" class="form-control fw-bold" placeholder="자격증"></div>
+                            <div class="col-md-6"><input type="text" th:field="*{certifications[__${stat.index}__].issueDate}" class="form-control" placeholder="취득일"></div>
+                            <div class="col-12"><input type="text" th:field="*{certifications[__${stat.index}__].additionalInfo}" class="form-control bg-light form-control-sm" placeholder="상세"></div>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger btn-sm ms-3" onclick="removeElement(this)">X</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm mt-3" onclick="addCertification()">+ 자격증 추가</button>
+            </div>
+
+            <div th:if="${sec.sectionType.name() == 'SKILLS'}">
+                <div id="skillList" class="sortable-list row g-3">
+                    <div th:each="skill, sStat : *{skills}" class="col-md-6 list-item">
+                        <div class="border rounded p-3 position-relative bg-light h-100">
+                            <i class="bi bi-grip-horizontal drag-handle position-absolute top-0 end-0 m-2 text-secondary"></i>
+                            <input type="hidden" th:field="*{skills[__${sStat.index}__].id}">
+                            <input type="hidden" class="sort-order" th:field="*{skills[__${sStat.index}__].sortOrder}">
+                            <div class="mb-2"><label class="small text-muted">스킬명</label><input type="text" th:field="*{skills[__${sStat.index}__].name}" class="form-control fw-bold"></div>
+                            <div class="mb-2"><label class="small text-muted">설명</label><input type="text" th:field="*{skills[__${sStat.index}__].description}" class="form-control form-control-sm"></div>
+                            <div class="text-end"><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeElement(this)">삭제</button></div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm mt-3" onclick="addSkill()">+ 스킬 추가</button>
+            </div>
+
+        </div> </div> <div class="fixed-bottom bg-white border-top p-3 text-center shadow" style="z-index: 1000;">
+    <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5">전체 저장하기</button>
+</div>
+
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        initAllSortables();
+    });
+
+    function initAllSortables() {
+        // 모든 레벨의 Sortable 초기화
+        initSortableContainer('mainSectionList', '.drag-handle-root', '.root-sort-order');
+        document.querySelectorAll('.sortable-list').forEach(el => initSortableElement(el, '.drag-handle', '.sort-order'));
+        document.querySelectorAll('.project-sortable-list').forEach(el => initSortableElement(el, '.drag-handle', '.project-sort-order'));
+        document.querySelectorAll('.meta-sortable-list').forEach(el => initSortableElement(el, '.drag-handle', '.meta-sort-order'));
+        document.querySelectorAll('.tech-sortable-list').forEach(el => initSortableElement(el, '.drag-handle', '.tech-sort-order'));
+        document.querySelectorAll('.solution-sortable-list').forEach(el => initSortableElement(el, '.drag-handle', '.solution-sort-order'));
+        document.querySelectorAll('.impact-sortable-list').forEach(el => initSortableElement(el, '.drag-handle', '.impact-sort-order'));
+    }
+
+    function initSortableContainer(id, handle, input) {
+        const el = document.getElementById(id);
+        if(el) initSortableElement(el, handle, input);
+    }
+
+    function initSortableElement(el, handle, inputSelector) {
+        if(el.getAttribute('data-sortable-init')) return;
+        new Sortable(el, {
+            handle: handle,
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd: function (evt) { updateSortOrders(el, inputSelector); }
+        });
+        el.setAttribute('data-sortable-init', 'true');
+    }
+
+    function updateSortOrders(container, inputSelector) {
+        Array.from(container.children).forEach((item, index) => {
+            const input = item.querySelector(inputSelector);
+            if(input) input.value = index;
+        });
+    }
+
+    function getSafeIndex(containerId, namePrefix) {
+        const container = document.getElementById(containerId);
+        if (!container) return 0;
+        const inputs = container.getElementsByTagName('input');
+        let max = -1;
+        const searchStr = namePrefix + "[";
+        for(let i=0; i<inputs.length; i++) {
+            const name = inputs[i].name;
+            if(name && name.startsWith(searchStr)) {
+                const rest = name.substring(searchStr.length);
+                const closeBracket = rest.indexOf("]");
+                if(closeBracket > -1) {
+                    const idx = parseInt(rest.substring(0, closeBracket));
+                    if(!isNaN(idx) && idx > max) max = idx;
+                }
+            }
+        }
+        return max + 1;
+    }
+
+    function removeElement(btn) {
+        if(confirm('삭제하시겠습니까? (저장 시 반영됨)')) {
+            let target = btn.closest('.list-item') || btn.closest('.project-item') || btn.closest('.meta-item') || btn.closest('.tech-item') || btn.closest('.solution-item') || btn.closest('.impact-item');
+            if(target) target.remove();
+        }
+    }
+
+    // --- Dynamic Add Functions ---
+    // [addKeyRole, addCompany, addEducation, addCertification, addSkill functions omitted for brevity - Assume same as before]
+    // ... Copy the previous add functions here ...
+
+    // [Here I include the updated add functions for Project/Solution/Impact to support Sort/Visible]
+
+    function addKeyRole() {
+        const idx = getSafeIndex('keyRoleList', 'keyRoles');
+        const html = `<div class="list-item d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle me-2"></i><input type="hidden" name="keyRoles[${idx}].sortOrder" class="sort-order" value="99"><input type="hidden" name="keyRoles[${idx}].visible" value="true"><div class="flex-grow-1 me-2"><textarea name="keyRoles[${idx}].roleContent" class="form-control form-control-sm" rows="1"></textarea></div><button type="button" class="btn btn-outline-danger btn-sm" onclick="removeElement(this)">X</button></div>`;
+        document.getElementById('keyRoleList').insertAdjacentHTML('beforeend', html);
+    }
+
+    function addCompany() {
+        const idx = getSafeIndex('companyList', 'companies');
+        const html = `<div class="list-item bg-light border p-3 mb-4 rounded-3"><div class="d-flex align-items-center mb-3"><i class="bi bi-grip-vertical drag-handle fs-4 me-2"></i><input type="hidden" name="companies[${idx}].sortOrder" class="sort-order" value="99"><input type="hidden" name="companies[${idx}].visible" value="true"><div class="flex-grow-1 me-3"><input type="text" name="companies[${idx}].name" class="form-control fw-bold"></div><div class="mx-3 border-start ps-3 d-flex align-items-center"><span class="badge bg-secondary me-2">TYPE</span><div class="form-check form-check-inline mb-0"><input class="form-check-input company-type-radio" type="radio" name="companyType-${idx}" value="WORK" checked><label class="form-check-label small">WORK</label></div><div class="form-check form-check-inline mb-0"><input class="form-check-input company-type-radio" type="radio" name="companyType-${idx}" value="PERSONAL"><label class="form-check-label small">PERSONAL</label></div></div><div class="form-check form-switch"><input class="form-check-input" type="checkbox" checked onchange="this.previousElementSibling.value=this.checked"></div><button type="button" class="btn btn-outline-danger btn-sm ms-3" onclick="removeElement(this)">삭제</button></div><div id="projectList-${idx}" class="project-sortable-list bg-white p-3 rounded border"></div><div class="text-end mt-3"><button type="button" class="btn btn-primary btn-sm" onclick="addFullProject(${idx})">+ 프로젝트 추가</button></div></div>`;
+        document.getElementById('companyList').insertAdjacentHTML('beforeend', html);
+        initAllSortables();
+    }
+
+    function addEducation() { const idx = getSafeIndex('eduList', 'educations'); const html = `<div class="list-item d-flex align-items-start mb-3 border-bottom pb-2"><i class="bi bi-grip-vertical drag-handle mt-2 me-2"></i><input type="hidden" name="educations[${idx}].sortOrder" class="sort-order" value="99"><input type="hidden" name="educations[${idx}].visible" value="true"><div class="row g-2 flex-grow-1"><div class="col-md-4"><input type="text" name="educations[${idx}].institution" class="form-control fw-bold" placeholder="학교"></div><div class="col-md-3"><input type="text" name="educations[${idx}].period" class="form-control" placeholder="기간"></div><div class="col-md-3"><input type="text" name="educations[${idx}].major" class="form-control" placeholder="전공"></div><div class="col-md-2"><input type="text" name="educations[${idx}].gpa" class="form-control" placeholder="학점"></div><div class="col-12"><textarea name="educations[${idx}].additionalInfo" class="form-control bg-light form-control-sm" rows="1"></textarea></div></div><button type="button" class="btn btn-outline-danger btn-sm ms-3" onclick="removeElement(this)">X</button></div>`; document.getElementById('eduList').insertAdjacentHTML('beforeend', html); }
+    function addCertification() { const idx = getSafeIndex('certList', 'certifications'); const html = `<div class="list-item d-flex align-items-center mb-3 border-bottom pb-2"><i class="bi bi-grip-vertical drag-handle me-2"></i><input type="hidden" name="certifications[${idx}].sortOrder" class="sort-order" value="99"><input type="hidden" name="certifications[${idx}].visible" value="true"><div class="row g-2 flex-grow-1"><div class="col-md-6"><input type="text" name="certifications[${idx}].name" class="form-control fw-bold" placeholder="자격증"></div><div class="col-md-6"><input type="text" name="certifications[${idx}].issueDate" class="form-control" placeholder="취득일"></div><div class="col-12"><input type="text" name="certifications[${idx}].additionalInfo" class="form-control bg-light form-control-sm" placeholder="상세"></div></div><button type="button" class="btn btn-outline-danger btn-sm ms-3" onclick="removeElement(this)">X</button></div>`; document.getElementById('certList').insertAdjacentHTML('beforeend', html); }
+    function addSkill() { const idx = getSafeIndex('skillList', 'skills'); const html = `<div class="col-md-6 list-item"><div class="border rounded p-3 position-relative bg-light h-100"><i class="bi bi-grip-horizontal drag-handle position-absolute top-0 end-0 m-2 text-secondary"></i><input type="hidden" name="skills[${idx}].sortOrder" class="sort-order" value="99"><div class="mb-2"><label class="small text-muted">스킬명</label><input type="text" name="skills[${idx}].name" class="form-control fw-bold"></div><div class="mb-2"><label class="small text-muted">설명</label><input type="text" name="skills[${idx}].description" class="form-control form-control-sm"></div><div class="text-end"><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeElement(this)">삭제</button></div></div></div>`; document.getElementById('skillList').insertAdjacentHTML('beforeend', html); initAllSortables(); }
+
+    function addFullProject(cIdx) {
+        const typeRadio = document.querySelector(`input[name="companyType-${cIdx}"]:checked`);
+        const pType = typeRadio ? typeRadio.value : 'WORK';
+        const pIdx = getSafeIndex(`projectList-${cIdx}`, `companies[${cIdx}].projects`);
+        const m0=0, m1=1, m2=2, m3=3;
+
+        const html = `
+        <div class="project-item border-bottom pb-4 mb-4">
+            <div class="d-flex align-items-center mb-2 bg-light p-2 rounded">
+                <i class="bi bi-grip-vertical drag-handle me-2"></i>
+                <span class="badge bg-warning text-dark me-2">NEW</span>
+                <input type="hidden" name="companies[${cIdx}].projects[${pIdx}].sortOrder" class="project-sort-order" value="99">
+                <input type="hidden" name="companies[${cIdx}].projects[${pIdx}].type" value="${pType}">
+                <input type="text" name="companies[${cIdx}].projects[${pIdx}].title" class="form-control fw-bold border-0 bg-transparent" placeholder="새 프로젝트명">
+                <div class="form-check form-switch ms-2"><input class="form-check-input" type="checkbox" checked onchange="this.nextElementSibling.value=this.checked"><input type="hidden" name="companies[${cIdx}].projects[${pIdx}].visible" value="true"></div>
+                <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="removeElement(this)">삭제</button>
+            </div>
+            <div id="metaList-${cIdx}-${pIdx}" class="meta-sortable-list ps-3 border-start ms-2">
+                <div class="meta-item mb-3 bg-white border rounded p-2"><input type="hidden" name="companies[${cIdx}].projects[${pIdx}].metaItems[${m0}].itemType" value="DURATION"><input type="hidden" name="companies[${cIdx}].projects[${pIdx}].metaItems[${m0}].sortOrder" class="meta-sort-order" value="0"><div class="d-flex align-items-center mb-2 border-bottom pb-1"><i class="bi bi-grip-horizontal drag-handle me-2"></i><span class="badge bg-light text-dark border me-auto">📅 기간</span><div class="form-check form-switch form-check-sm"><input class="form-check-input" type="checkbox" checked onchange="this.nextElementSibling.value=this.checked"><input type="hidden" name="companies[${cIdx}].projects[${pIdx}].metaItems[${m0}].visible" value="true"></div></div><input type="text" name="companies[${cIdx}].projects[${pIdx}].metaItems[${m0}].content" class="form-control form-control-sm border-0" placeholder="기간"></div>
+                <div class="meta-item mb-3 bg-white border rounded p-2"><input type="hidden" name="companies[${cIdx}].projects[${pIdx}].metaItems[${m1}].itemType" value="SUMMARY"><input type="hidden" name="companies[${cIdx}].projects[${pIdx}].metaItems[${m1}].sortOrder" class="meta-sort-order" value="1"><div class="d-flex align-items-center mb-2 border-bottom pb-1"><i class="bi bi-grip-horizontal drag-handle me-2"></i><span class="badge bg-light text-dark border me-auto">📝 요약</span><div class="form-check form-switch form-check-sm"><input class="form-check-input" type="checkbox" checked onchange="this.nextElementSibling.value=this.checked"><input type="hidden" name="companies[${cIdx}].projects[${pIdx}].metaItems[${m1}].visible" value="true"></div></div><textarea name="companies[${cIdx}].projects[${pIdx}].metaItems[${m1}].content" class="form-control form-control-sm border-0" rows="2" placeholder="요약"></textarea></div>
+                <div class="meta-item mb-3 bg-white border rounded p-2"><input type="hidden" name="companies[${cIdx}].projects[${pIdx}].metaItems[${m2}].itemType" value="TECH_STACK_GROUP"><input type="hidden" name="companies[${cIdx}].projects[${pIdx}].metaItems[${m2}].sortOrder" class="meta-sort-order" value="2"><div class="d-flex align-items-center mb-2 border-bottom pb-1"><i class="bi bi-grip-horizontal drag-handle me-2"></i><span class="badge bg-light text-dark border me-auto">🛠 기술 스택</span><div class="form-check form-switch form-check-sm"><input class="form-check-input" type="checkbox" checked onchange="this.nextElementSibling.value=this.checked"><input type="hidden" name="companies[${cIdx}].projects[${pIdx}].metaItems[${m2}].visible" value="true"></div></div><div id="techList-${cIdx}-${pIdx}-${m2}" class="tech-sortable-list d-flex flex-wrap gap-2"></div><button type="button" class="btn btn-sm btn-link p-0 mt-2" onclick="addTechStack(${cIdx}, ${pIdx}, ${m2})">+ 기술</button></div>
+                <div class="meta-item mb-3 bg-white border rounded p-2"><input type="hidden" name="companies[${cIdx}].projects[${pIdx}].metaItems[${m3}].itemType" value="CONTENT_GROUP"><input type="hidden" name="companies[${cIdx}].projects[${pIdx}].metaItems[${m3}].sortOrder" class="meta-sort-order" value="3"><div class="d-flex align-items-center mb-2 border-bottom pb-1"><i class="bi bi-grip-horizontal drag-handle me-2"></i><span class="badge bg-light text-dark border me-auto">상세 내용</span><div class="form-check form-switch form-check-sm"><input class="form-check-input" type="checkbox" checked onchange="this.nextElementSibling.value=this.checked"><input type="hidden" name="companies[${cIdx}].projects[${pIdx}].metaItems[${m3}].visible" value="true"></div></div><div id="probList-${cIdx}-${pIdx}-${m3}"></div><button type="button" class="btn btn-sm btn-outline-secondary w-100 mt-2" onclick="addProblem(${cIdx}, ${pIdx}, ${m3})">+ 에피소드</button></div>
+            </div>
+        </div>`;
+        document.getElementById(`projectList-${cIdx}`).insertAdjacentHTML('beforeend', html);
+        initAllSortables();
+        addTechStack(cIdx, pIdx, m2);
+        addProblem(cIdx, pIdx, m3);
+    }
+
+    function addTechStack(c,p,m) {
+        const id = `techList-${c}-${p}-${m}`;
+        const tIdx = getSafeIndex(id, `companies[${c}].projects[${p}].metaItems[${m}].techStacks`);
+        const html = `<div class="tech-item input-group input-group-sm w-auto"><span class="input-group-text bg-light border-0 px-1 drag-handle">::</span><input type="hidden" name="companies[${c}].projects[${p}].metaItems[${m}].techStacks[${tIdx}].sortOrder" class="tech-sort-order" value="99"><input type="text" name="companies[${c}].projects[${p}].metaItems[${m}].techStacks[${tIdx}].techName" class="form-control" placeholder="기술명"><div class="input-group-text bg-white border-start-0 ps-1"><input class="form-check-input mt-0" type="checkbox" checked onchange="this.nextElementSibling.value=this.checked"><input type="hidden" name="companies[${c}].projects[${p}].metaItems[${m}].techStacks[${tIdx}].visible" value="true"></div><button type="button" class="btn btn-outline-secondary" onclick="removeElement(this)">x</button></div>`;
+        document.getElementById(id).insertAdjacentHTML('beforeend', html);
+        initAllSortables();
+    }
+
+    function addProblem(c,p,m) {
+        const id = `probList-${c}-${p}-${m}`;
+        const pbIdx = getSafeIndex(id, `companies[${c}].projects[${p}].metaItems[${m}].problems`);
+        const html = `<div class="mb-3 ps-3 border-start border-3 border-light"><div class="mb-2"><input type="hidden" name="companies[${c}].projects[${p}].metaItems[${m}].problems[${pbIdx}].sortOrder" value="0"><input type="text" name="companies[${c}].projects[${p}].metaItems[${m}].problems[${pbIdx}].title" class="form-control form-control-sm fw-bold bg-light" placeholder="문제 정의"></div><div id="solList-${c}-${p}-${m}-${pbIdx}" class="solution-sortable-list ps-3 mb-1"></div><div class="ps-4 mb-2"><button type="button" class="btn btn-xs btn-light text-primary py-0" style="font-size:0.7rem" onclick="addSolution(${c}, ${p}, ${m}, ${pbIdx})">+ 해결</button></div><div id="impList-${c}-${p}-${m}-${pbIdx}" class="impact-sortable-list ps-3"></div><div class="ps-4"><button type="button" class="btn btn-xs btn-light text-success py-0" style="font-size:0.7rem" onclick="addImpact(${c}, ${p}, ${m}, ${pbIdx})">+ 성과</button></div><div class="text-end mt-1"><button type="button" class="btn btn-xs btn-link text-danger" onclick="removeElement(this)">삭제</button></div></div>`;
+        document.getElementById(id).insertAdjacentHTML('beforeend', html);
+        addSolution(c, p, m, pbIdx);
+        addImpact(c, p, m, pbIdx);
+        initAllSortables();
+    }
+
+    function addSolution(c,p,m,pb) {
+        const id = `solList-${c}-${p}-${m}-${pb}`;
+        const idx = getSafeIndex(id, `companies[${c}].projects[${p}].metaItems[${m}].problems[${pb}].solutions`);
+        const html = `<div class="solution-item input-group input-group-sm mb-1"><span class="input-group-text bg-white border-0 px-1 drag-handle" style="cursor:move;">::</span><input type="hidden" name="companies[${c}].projects[${p}].metaItems[${m}].problems[${pb}].solutions[${idx}].sortOrder" class="solution-sort-order" value="99"><input type="text" name="companies[${c}].projects[${p}].metaItems[${m}].problems[${pb}].solutions[${idx}].content" class="form-control" placeholder="해결책"><div class="input-group-text bg-white border-start-0 ps-1"><input class="form-check-input mt-0" type="checkbox" checked onchange="this.nextElementSibling.value=this.checked"><input type="hidden" name="companies[${c}].projects[${p}].metaItems[${m}].problems[${pb}].solutions[${idx}].visible" value="true"></div><button type="button" class="btn btn-outline-light text-danger border-0" onclick="removeElement(this)">x</button></div>`;
+        document.getElementById(id).insertAdjacentHTML('beforeend', html);
+        initAllSortables();
+    }
+
+    function addImpact(c,p,m,pb) {
+        const id = `impList-${c}-${p}-${m}-${pb}`;
+        const idx = getSafeIndex(id, `companies[${c}].projects[${p}].metaItems[${m}].problems[${pb}].impacts`);
+        const html = `<div class="impact-item input-group input-group-sm mb-1"><span class="input-group-text bg-white border-0 px-1 drag-handle" style="cursor:move;">::</span><input type="hidden" name="companies[${c}].projects[${p}].metaItems[${m}].problems[${pb}].impacts[${idx}].sortOrder" class="impact-sort-order" value="99"><input type="text" name="companies[${c}].projects[${p}].metaItems[${m}].problems[${pb}].impacts[${idx}].content" class="form-control" placeholder="성과"><div class="input-group-text bg-white border-start-0 ps-1"><input class="form-check-input mt-0" type="checkbox" checked onchange="this.nextElementSibling.value=this.checked"><input type="hidden" name="companies[${c}].projects[${p}].metaItems[${m}].problems[${pb}].impacts[${idx}].visible" value="true"></div><button type="button" class="btn btn-outline-light text-danger border-0" onclick="removeElement(this)">x</button></div>`;
+        document.getElementById(id).insertAdjacentHTML('beforeend', html);
+        initAllSortables();
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', function() {
+        updateSortOrders(document.getElementById('mainSectionList'), '.root-sort-order');
+        ['keyRoleList', 'companyList', 'eduList', 'certList', 'skillList'].forEach(id => { const el = document.getElementById(id); if(el) updateSortOrders(el, '.sort-order'); });
+        document.querySelectorAll('.project-sortable-list').forEach(el => updateSortOrders(el, '.project-sort-order'));
+        document.querySelectorAll('.meta-sortable-list').forEach(el => updateSortOrders(el, '.meta-sort-order'));
+        document.querySelectorAll('.tech-sortable-list').forEach(el => updateSortOrders(el, '.tech-sort-order'));
+        document.querySelectorAll('.solution-sortable-list').forEach(el => updateSortOrders(el, '.solution-sort-order'));
+        document.querySelectorAll('.impact-sortable-list').forEach(el => updateSortOrders(el, '.impact-sort-order'));
+    });
+</script>
+</body>
+</html>

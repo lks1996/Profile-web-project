@@ -1,0 +1,11 @@
+package com.example.profile.repository;
+
+import com.example.profile.model.Education;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface EducationRepository extends JpaRepository<Education, Long> {
+    // Controller에서 호출하는 정렬 메서드 정의
+    List<Education> findAllByOrderBySortOrderAsc();
+}
