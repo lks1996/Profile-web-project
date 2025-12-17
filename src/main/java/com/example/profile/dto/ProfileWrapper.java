@@ -11,7 +11,8 @@ public class ProfileWrapper {
     private List<ResumeSection> sections = new ArrayList<>();
     private List<KeyRole> keyRoles = new ArrayList<>();
     private List<Company> companies = new ArrayList<>();
-    private List<Skill> skills = new ArrayList<>();
     private List<Education> educations = new ArrayList<>();
     private List<Certification> certifications = new ArrayList<>();
+    private List<SkillCategory> skillCategories = new ArrayList<>();
+    private List<String> detectedSkills = new ArrayList<>();
 }

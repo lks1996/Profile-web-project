@@ -18,7 +18,7 @@ public class FrontProfileService {
     @Autowired private KeyRoleRepository keyRoleRepo;
     @Autowired private CompanyRepository companyRepo;
     @Autowired private ProjectMasterRepository projectMasterRepo;
-    @Autowired private SkillRepository skillRepo;
+    @Autowired private SkillCategoryRepository skillCategoryRepo;
     @Autowired private ProblemRepository problemRepo;
     @Autowired private SolutionRepository solutionRepo;
     @Autowired private ImpactRepository impactRepo;
@@ -99,17 +99,32 @@ public class FrontProfileService {
     }
 
     private List<Object> buildSkillContent() {
-        // isVisible=true인 Skill Entity 조회
-        List<Skill> allSkills = skillRepo.findByIsVisibleTrueOrderByCategoryAscNameAsc();
+        // 1. 정렬된 카테고리 목록 조회
+        // (findAllByOrderBySortOrderAsc 메서드는 AdminProfileService 때문에 이미 Repository에 있을 것입니다)
+        List<SkillCategory> categories = skillCategoryRepo.findAllByOrderBySortOrderAsc();
 
-        // Category별로 그룹화하여 Map 형태로 DTO에 담거나, List<Skill> 자체를 DTO로 변환할 수 있음
-        // 여기서는 Category별 Map으로 간결하게 구성
-        return allSkills.stream()
-                .collect(Collectors.groupingBy(
-                        Skill::getCategory,
-                        Collectors.mapping(Skill::getName, Collectors.toList())
-                )).entrySet().stream()
-                .map(entry -> (Object) new String[] { entry.getKey(), entry.getValue().toString() }) // DTO 규격에 맞게 조정 필요
+        // 2. 스트림을 사용하여 데이터 변환
+        return categories.stream()
+                // 2-1. 카테고리 자체가 '노출(Visible)' 상태인 것만 통과
+                .filter(SkillCategory::isVisible)
+                .map(cat -> {
+                    // 2-2. 해당 카테고리 안에서 '노출(Visible)' 상태인 스킬 이름만 추출
+                    List<String> validSkills = cat.getSkills().stream()
+                            .filter(Skill::isVisible)
+                            .map(Skill::getName)
+                            .collect(Collectors.toList());
+
+                    // 2-3. 노출할 스킬이 하나도 없으면 이 카테고리는 무시(null 반환)
+                    if (validSkills.isEmpty()) {
+                        return null;
+                    }
+
+                    // 2-4. 기존 포맷 유지: Object[] { "카테고리명", "[스킬1, 스킬2, ...]" }
+                    // 프론트엔드(Mustache/Thymeleaf)가 이 배열 구조를 쓰고 있다면 에러 없이 동작할 것입니다.
+                    return new String[] { cat.getName(), validSkills.toString() };
+                })
+                // 2-5. 위에서 null로 반환된(스킬 없는) 카테고리 제거
+                .filter(obj -> obj != null)
                 .collect(Collectors.toList());
     }
 

@@ -21,9 +21,6 @@ public class ProjectMaster {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
-    @Enumerated(EnumType.STRING) // 이 어노테이션이 있어야 "WORK" 문자열로 저장됨
-    @Column(nullable = false)
-    private ProjectType type;
     @Column(name = "title", nullable = false)
     private String title;
     @Column(name = "sort_order", nullable = false)
@@ -36,7 +33,6 @@ public class ProjectMaster {
 
     public void establishRelationship() {
         // 1. 기본값 안전장치 (Service에 있던 로직 이동)
-        if (this.type == null) this.type = ProjectType.WORK;
         if (this.title == null || this.title.trim().isEmpty()) this.title = "이름 없는 프로젝트";
 
         // 2. 자식들(MetaItems) 챙기기

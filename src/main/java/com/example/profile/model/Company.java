@@ -17,6 +17,8 @@ public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(length = 20)
+    private String type = "WORK";
     private String name;
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;

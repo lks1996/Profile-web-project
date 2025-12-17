@@ -11,15 +11,17 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "skill_set")
 public class Skill {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-    private String category;
-    @Column(nullable = false)
+
     private String name;
-    @Column(name = "sort_order", nullable = false)
-    private int sortOrder;
-    @Column(name = "is_visible", nullable = false)
+
+    private Integer sortOrder;
+
     private boolean isVisible = true;
+
+    // [변경] 부모 카테고리 연결
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private SkillCategory category;
 }
