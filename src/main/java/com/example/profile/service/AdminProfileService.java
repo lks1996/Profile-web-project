@@ -142,28 +142,89 @@ public class AdminProfileService {
 
         // 5. 학력 (Education) 저장
         if (wrapper.getEducations() != null) {
-            // 학교명이 없는 빈 데이터 제거
+            // A. 빈 데이터 정리 (학교명이 없으면 저장 안 함)
             wrapper.getEducations().removeIf(edu ->
                     edu.getInstitution() == null || edu.getInstitution().trim().isEmpty());
+
+            // B. [핵심] 삭제 대상 찾기 (Orphan Removal)
+            // 1) 프론트에서 넘어온 ID 목록 (유효한 ID만 수집)
+            Set<Long> inputIds = wrapper.getEducations().stream()
+                    .map(Education::getId)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+
+            // 2) DB에 있는 모든 데이터 조회
+            List<Education> existingEdus = eduRepo.findAll();
+
+            // 3) (DB 데이터) - (입력 데이터) = 삭제 대상
+            List<Education> toDelete = existingEdus.stream()
+                    .filter(edu -> !inputIds.contains(edu.getId()))
+                    .collect(Collectors.toList());
+
+            // 4) 삭제 실행
+            eduRepo.deleteAll(toDelete);
+
+            // C. 나머지 저장
             eduRepo.saveAll(wrapper.getEducations());
+        } else {
+            // 리스트가 아예 없으면 전체 삭제
+            eduRepo.deleteAll();
         }
 
         // 6. 자격증 (Certification) 저장
         if (wrapper.getCertifications() != null) {
+            // A. 빈 데이터 정리 (자격증명이 없으면 저장 안 함)
             wrapper.getCertifications().removeIf(cert ->
                     cert.getName() == null || cert.getName().trim().isEmpty());
+
+            // B. [핵심] 삭제 대상 찾기
+            Set<Long> inputIds = wrapper.getCertifications().stream()
+                    .map(Certification::getId)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+
+            List<Certification> existingCerts = certRepo.findAll();
+
+            List<Certification> toDelete = existingCerts.stream()
+                    .filter(cert -> !inputIds.contains(cert.getId()))
+                    .collect(Collectors.toList());
+
+            // 삭제 실행
+            certRepo.deleteAll(toDelete);
+
+            // C. 저장
             certRepo.saveAll(wrapper.getCertifications());
+        } else {
+            certRepo.deleteAll();
         }
 
         // 7. Skill Categories 저장
         if (wrapper.getSkillCategories() != null) {
+            // 1) 빈 데이터 정리
             wrapper.getSkillCategories().removeIf(cat ->
                     cat.getName() == null || cat.getName().trim().isEmpty());
 
+            // 2) [핵심] 삭제 대상 찾기 (Orphan Removal)
+            Set<Long> inputIds = wrapper.getSkillCategories().stream()
+                    .map(SkillCategory::getId)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+
+            List<SkillCategory> existingCats = skillCategoryRepo.findAll();
+
+            List<SkillCategory> toDelete = existingCats.stream()
+                    .filter(cat -> !inputIds.contains(cat.getId()))
+                    .collect(Collectors.toList());
+
+            skillCategoryRepo.deleteAll(toDelete); // 삭제 실행
+
+            // 3) 관계 설정 및 저장
             for (SkillCategory cat : wrapper.getSkillCategories()) {
-                cat.establishRelationship(); // 관계 설정
+                cat.establishRelationship();
             }
             skillCategoryRepo.saveAll(wrapper.getSkillCategories());
+        } else {
+            skillCategoryRepo.deleteAll();
         }
     }
 

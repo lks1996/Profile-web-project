@@ -80,23 +80,27 @@
                 <div class="mt-4">
                     <label class="form-label fw-bold mb-2">📌 주요 경험 요약 (Key Experience)</label>
                     <div id="keyRoleList" class="sortable-list">
-
                         <div th:each="role, rStat : *{keyRoles}" class="list-item key-role-item d-flex align-items-center mb-2 bg-white p-2 border rounded">
-
                             <i class="bi bi-grip-vertical drag-handle me-2 text-secondary"></i>
 
                             <input type="hidden" th:field="*{keyRoles[__${rStat.index}__].id}">
                             <input type="hidden" class="sort-order" th:field="*{keyRoles[__${rStat.index}__].sortOrder}">
 
                             <div class="flex-grow-1 me-2">
-                                <input type="text" th:field="*{keyRoles[__${rStat.index}__].roleContent}" class="form-control border-0 bg-transparent" placeholder="핵심 경험을 한 줄로 요약하세요">
+                                <textarea th:field="*{keyRoles[__${rStat.index}__].roleContent}" class="form-control border-0 bg-transparent" rows="2" placeholder="핵심 경험을 요약해서 작성하세요"></textarea>
+                            </div>
+
+                            <div class="form-check form-switch me-2" title="노출 여부">
+                                <input class="form-check-input" type="checkbox"
+                                       th:checked="${role.visible}"
+                                       onchange="this.nextElementSibling.value = this.checked">
+                                <input type="hidden" th:field="*{keyRoles[__${rStat.index}__].visible}">
                             </div>
 
                             <button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="removeElement(this)">
                                 <i class="bi bi-x-lg"></i>
                             </button>
                         </div>
-
                     </div>
                     <button type="button" class="btn btn-sm btn-link px-0 text-decoration-none" onclick="addKeyRole()">
                         <i class="bi bi-plus-circle"></i> 경험 한 줄 추가
@@ -168,14 +172,26 @@
                                         <div th:if="${meta.itemType.toString() == 'SUMMARY'}"><textarea th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].content}" class="form-control form-control-sm border-0" rows="2" placeholder="요약"></textarea></div>
                                         <div th:if="${meta.itemType.toString() == 'TECH_STACK_GROUP'}">
                                             <div th:id="'techList-' + ${cStat.index} + '-' + ${pStat.index} + '-' + ${mStat.index}" class="tech-sortable-list d-flex flex-wrap gap-2">
+
                                                 <div th:each="stack, tStat : ${meta.techStacks}" class="tech-item input-group input-group-sm w-auto">
                                                     <span class="input-group-text bg-light border-0 px-1 drag-handle">::</span>
+
                                                     <input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].techStacks[__${tStat.index}__].id}">
                                                     <input type="hidden" class="tech-sort-order" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].techStacks[__${tStat.index}__].sortOrder}">
+
                                                     <input type="text" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].techStacks[__${tStat.index}__].techName}" class="form-control" placeholder="기술">
-                                                    <div class="input-group-text bg-white border-start-0 ps-1"><input class="form-check-input mt-0" type="checkbox" th:checked="${stack.visible}" onchange="this.nextElementSibling.value=this.checked"><input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].techStacks[__${tStat.index}__].visible}"></div>
+
+                                                    <div class="input-group-text bg-white border-start-0 ps-1">
+                                                        <input class="form-check-input mt-0" type="checkbox"
+                                                               th:checked="${stack.visible}"
+                                                               onchange="this.nextElementSibling.value=this.checked; syncAllSkills();">
+
+                                                        <input type="hidden" th:field="*{companies[__${cStat.index}__].projects[__${pStat.index}__].metaItems[__${mStat.index}__].techStacks[__${tStat.index}__].visible}">
+                                                    </div>
+
                                                     <button type="button" class="btn btn-outline-secondary" onclick="removeElement(this)">x</button>
                                                 </div>
+
                                             </div>
                                             <button type="button" class="btn btn-sm btn-link p-0 mt-2" th:onclick="'addTechStack(' + ${cStat.index} + ',' + ${pStat.index} + ',' + ${mStat.index} + ')'">+ 기술</button>
                                         </div>
@@ -225,41 +241,105 @@
             </div>
 
             <div th:if="${sec.sectionType.name() == 'EDUCATION'}">
-                <div id="eduList" class="sortable-list">
-                    <div th:each="edu, stat : *{educations}" class="list-item d-flex align-items-start mb-3 border-bottom pb-2">
-                        <i class="bi bi-grip-vertical drag-handle mt-2 me-2"></i>
-                        <input type="hidden" th:field="*{educations[__${stat.index}__].id}">
-                        <input type="hidden" class="sort-order" th:field="*{educations[__${stat.index}__].sortOrder}">
-                        <input type="hidden" th:field="*{educations[__${stat.index}__].visible}">
-                        <div class="row g-2 flex-grow-1">
-                            <div class="col-md-4"><input type="text" th:field="*{educations[__${stat.index}__].institution}" class="form-control fw-bold" placeholder="학교"></div>
-                            <div class="col-md-3"><input type="text" th:field="*{educations[__${stat.index}__].period}" class="form-control" placeholder="기간"></div>
-                            <div class="col-md-3"><input type="text" th:field="*{educations[__${stat.index}__].major}" class="form-control" placeholder="전공"></div>
-                            <div class="col-md-2"><input type="text" th:field="*{educations[__${stat.index}__].gpa}" class="form-control" placeholder="학점"></div>
-                            <div class="col-12"><textarea th:field="*{educations[__${stat.index}__].additionalInfo}" class="form-control bg-light form-control-sm" rows="1"></textarea></div>
-                        </div>
-                        <button type="button" class="btn btn-outline-danger btn-sm ms-3" onclick="removeElement(this)">X</button>
-                    </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-muted mb-0">학력 정보</h6>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addEducation()">+ 학력 추가</button>
                 </div>
-                <button type="button" class="btn btn-outline-primary btn-sm mt-3" onclick="addEducation()">+ 학력 추가</button>
+
+                <div id="educationList" class="sortable-list">
+
+                    <div th:each="edu, eStat : *{educations}" class="list-item bg-light border p-3 mb-3 rounded position-relative">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-grip-vertical drag-handle me-2 fs-5"></i>
+
+                            <input type="hidden" th:field="*{educations[__${eStat.index}__].id}">
+                            <input type="hidden" class="sort-order" th:field="*{educations[__${eStat.index}__].sortOrder}">
+
+                            <h6 class="mb-0 fw-bold">학력 상세</h6>
+
+                            <div class="ms-auto d-flex align-items-center">
+                                <div class="form-check form-switch me-2">
+                                    <input class="form-check-input" type="checkbox"
+                                           th:checked="${edu.visible}"
+                                           onchange="this.nextElementSibling.value = this.checked">
+                                    <input type="hidden" th:field="*{educations[__${eStat.index}__].visible}">
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeElement(this)">삭제</button>
+                            </div>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted mb-0">학교명</label>
+                                <input type="text" th:field="*{educations[__${eStat.index}__].institution}" class="form-control form-control-sm" placeholder="예: 한국대학교">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted mb-0">전공</label>
+                                <input type="text" th:field="*{educations[__${eStat.index}__].major}" class="form-control form-control-sm" placeholder="예: 컴퓨터공학">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small text-muted mb-0">학점</label>
+                                <input type="text" th:field="*{educations[__${eStat.index}__].gpa}" class="form-control form-control-sm" placeholder="예: 4.0/4.5">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small text-muted mb-0">기간</label>
+                                <input type="text" th:field="*{educations[__${eStat.index}__].period}" class="form-control form-control-sm" placeholder="예: 2015.03 - 2022.02">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small text-muted mb-0">추가 정보 (선택)</label>
+                                <textarea th:field="*{educations[__${eStat.index}__].additionalInfo}" class="form-control form-control-sm" rows="2" placeholder="졸업 논문 주제 등"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
             <div th:if="${sec.sectionType.name() == 'CERTIFICATION'}">
-                <div id="certList" class="sortable-list">
-                    <div th:each="cert, stat : *{certifications}" class="list-item d-flex align-items-center mb-3 border-bottom pb-2">
-                        <i class="bi bi-grip-vertical drag-handle me-2"></i>
-                        <input type="hidden" th:field="*{certifications[__${stat.index}__].id}">
-                        <input type="hidden" class="sort-order" th:field="*{certifications[__${stat.index}__].sortOrder}">
-                        <input type="hidden" th:field="*{certifications[__${stat.index}__].visible}">
-                        <div class="row g-2 flex-grow-1">
-                            <div class="col-md-6"><input type="text" th:field="*{certifications[__${stat.index}__].name}" class="form-control fw-bold" placeholder="자격증"></div>
-                            <div class="col-md-6"><input type="text" th:field="*{certifications[__${stat.index}__].issueDate}" class="form-control" placeholder="취득일"></div>
-                            <div class="col-12"><input type="text" th:field="*{certifications[__${stat.index}__].additionalInfo}" class="form-control bg-light form-control-sm" placeholder="상세"></div>
-                        </div>
-                        <button type="button" class="btn btn-outline-danger btn-sm ms-3" onclick="removeElement(this)">X</button>
-                    </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-muted mb-0">자격증 / 어학</h6>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addCertification()">+ 자격증 추가</button>
                 </div>
-                <button type="button" class="btn btn-outline-primary btn-sm mt-3" onclick="addCertification()">+ 자격증 추가</button>
+
+                <div id="certificationList" class="sortable-list">
+
+                    <div th:each="cert, certStat : *{certifications}" class="list-item bg-light border p-3 mb-2 rounded position-relative">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-grip-vertical drag-handle me-2 fs-5"></i>
+
+                            <input type="hidden" th:field="*{certifications[__${certStat.index}__].id}">
+                            <input type="hidden" class="sort-order" th:field="*{certifications[__${certStat.index}__].sortOrder}">
+
+                            <h6 class="mb-0 fw-bold">자격증 정보</h6>
+
+                            <div class="ms-auto d-flex align-items-center">
+                                <div class="form-check form-switch me-2">
+                                    <input class="form-check-input" type="checkbox"
+                                           th:checked="${cert.visible}"
+                                           onchange="this.nextElementSibling.value = this.checked">
+                                    <input type="hidden" th:field="*{certifications[__${certStat.index}__].visible}">
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeElement(this)">삭제</button>
+                            </div>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-md-8">
+                                <label class="form-label small text-muted mb-0">자격증명</label>
+                                <input type="text" th:field="*{certifications[__${certStat.index}__].name}" class="form-control form-control-sm" placeholder="예: 정보처리기사">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small text-muted mb-0">취득일</label>
+                                <input type="text" th:field="*{certifications[__${certStat.index}__].issueDate}" class="form-control form-control-sm" placeholder="예: 2023.05">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small text-muted mb-0">추가 정보 (선택)</label>
+                                <textarea th:field="*{certifications[__${certStat.index}__].additionalInfo}" class="form-control form-control-sm" rows="1" placeholder="발급기관이나 자격증 번호 등"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
             <div th:if="${sec.sectionType.name() == 'SKILLS'}">
@@ -301,11 +381,11 @@
 
                                     <input type="hidden" th:field="*{skillCategories[__${catStat.index}__].id}">
                                     <input type="hidden" class="sort-order" th:field="*{skillCategories[__${catStat.index}__].sortOrder}">
-                                    <input type="hidden" th:field="*{skillCategories[__${catStat.index}__].visible}">
 
                                     <input type="text" th:field="*{skillCategories[__${catStat.index}__].name}"
-                                           class="form-control form-control-sm fw-bold border-0 bg-transparent w-auto"
-                                           placeholder="카테고리명 (예: Language)">
+                                            class="form-control form-control-sm fw-bold border-0 bg-transparent"
+                                            style="width: 300px;"
+                                            placeholder="카테고리명 (예: Backend)">
 
                                     <div class="ms-auto d-flex align-items-center">
                                         <div class="form-check form-switch me-2">
@@ -354,15 +434,32 @@
     document.addEventListener("DOMContentLoaded", function() {
         initAllSortables();
 
-        refreshDetectedSkillsPool();
+        // 페이지 로드 시 '기존 저장된 스킬'을 수동 목록으로 복구
+        // DB에서 불러와서 이미 카테고리에 꽂혀있는 스킬들은 '유효한 스킬'로 인정해야 합니다.
+        document.querySelectorAll('#skillCategoryList .skill-item').forEach(item => {
+            const name = getSkillNameFromElement(item);
+            if (name) {
+                manualAddedSkills.add(name);
+            }
+        });
 
-        // 전역 이벤트 리스너 등록 (타이핑, 토글, 클릭 시 자동 업데이트)
-        document.body.addEventListener('input', debounce(refreshDetectedSkillsPool, 300)); // 타이핑 시 (약간 지연)
-        document.body.addEventListener('change', refreshDetectedSkillsPool); // 체크박스/라디오 토글 시
+        // 그 다음 동기화 실행 (이제 카테고리에 있는 스킬들이 삭제되지 않음)
+        syncAllSkills();
+
+        document.addEventListener('change', function(e) {
+            if (e.target.matches('input[type="checkbox"]')) {
+                if (e.target.nextElementSibling && e.target.nextElementSibling.type === 'hidden') {
+                    e.target.nextElementSibling.value = e.target.checked;
+                }
+                syncAllSkills();
+            }
+        });
+
+        document.body.addEventListener('input', debounce(syncAllSkills, 300));
+
         document.body.addEventListener('click', function(e) {
-            // 삭제 버튼이나 추가 버튼 눌렀을 때 업데이트
             if (e.target.closest('.btn') || e.target.closest('.bi-x-circle-fill')) {
-                setTimeout(refreshDetectedSkillsPool, 100); // DOM 변경 후 실행
+                setTimeout(syncAllSkills, 100);
             }
         });
     });
@@ -376,8 +473,9 @@
         };
     }
 
+    // [수정된 동기화 함수]
     function syncAllSkills() {
-        // 드래그 중에는 간섭하지 않음 (충돌 방지)
+        // 드래그 중에는 간섭하지 않음 (오류 방지)
         if (document.querySelector('.sortable-ghost')) return;
 
         // 1. [Source 수집] 현재 활성화(Visible)된 프로젝트 기술 스택 + 수동 입력 수집
@@ -397,9 +495,16 @@
 
                     if (!checkVisible(meta)) return; // 그룹 숨김
 
+                    // [수정 핵심] 개별 기술 태그 순회
                     meta.querySelectorAll('.tech-item').forEach(tech => {
-                        if (!checkVisible(tech)) return; // 태그 개별 숨김
 
+                        // 1. 개별 체크박스 찾기 (tech-item 바로 안에 있는 checkbox)
+                        const toggle = tech.querySelector('input[type="checkbox"]');
+
+                        // 2. 체크박스가 존재하고, 체크가 해제되어 있다면 -> 수집하지 않고 건너뜀
+                        if (toggle && !toggle.checked) return;
+
+                        // 3. 텍스트 값 수집
                         const nameInput = tech.querySelector('input[type="text"]');
                         if (nameInput && nameInput.value.trim() !== '') {
                             validSourceSkills.add(nameInput.value.trim());
@@ -412,34 +517,27 @@
         // 1-2. 수동 입력 스킬 합치기
         manualAddedSkills.forEach(skill => validSourceSkills.add(skill));
 
-
         // 2. [Category 청소] 유효하지 않은 스킬이 카테고리에 있다면 제거
-        // (프로젝트에서 삭제되거나 숨겨졌는데, 오른쪽 카테고리에 남아있는 경우 삭제)
         document.querySelectorAll('#skillCategoryList .skill-item').forEach(item => {
             const name = getSkillNameFromElement(item);
-
-            // 유효한 소스에도 없고, 수동 목록에도 없다면 -> 삭제 대상
             if (!validSourceSkills.has(name)) {
                 item.remove();
             }
         });
 
-        // 3. [Pool 계산] (유효한 소스) - (현재 카테고리에 있는 것) = (풀에 보여줄 것)
-
-        // 3-1. 현재 카테고리에 살아남은 스킬들 파악
+        // 3. [Pool 계산] (유효한 소스) - (현재 카테고리에 있는 것)
         const currentlyAssigned = new Set();
         document.querySelectorAll('#skillCategoryList .skill-item').forEach(item => {
             currentlyAssigned.add(getSkillNameFromElement(item));
         });
 
-        // 3-2. 차집합 계산
         const poolSkills = [...validSourceSkills].filter(x => !currentlyAssigned.has(x));
 
         // 4. [Render] 풀 다시 그리기
         const poolContainer = document.getElementById('detectedSkillPool');
         if(!poolContainer) return;
 
-        poolContainer.innerHTML = ''; // 초기화
+        poolContainer.innerHTML = '';
 
         poolSkills.forEach(tech => {
             const html = `
@@ -674,14 +772,15 @@
                 <div class="card-header bg-light d-flex align-items-center py-2">
                     <i class="bi bi-grip-vertical drag-handle me-2 text-secondary"></i>
                     <input type="hidden" name="skillCategories[${idx}].sortOrder" class="sort-order" value="99">
-                    <input type="hidden" name="skillCategories[${idx}].isVisible" value="true">
 
                     <input type="text" name="skillCategories[${idx}].name" class="form-control form-control-sm fw-bold border-0 bg-transparent w-auto" placeholder="새 카테고리">
 
                     <div class="ms-auto d-flex align-items-center">
                         <div class="form-check form-switch me-2">
                             <input class="form-check-input" type="checkbox" checked onchange="this.nextElementSibling.value=this.checked">
-                            <input type="hidden" name="skillCategories[${idx}].isVisible" value="true">
+
+                            <input type="hidden" name="skillCategories[${idx}].visible" value="true">
+
                         </div>
                         <button type="button" class="btn btn-xs btn-outline-danger border-0" onclick="removeElement(this)"><i class="bi bi-trash"></i></button>
                     </div>
@@ -692,7 +791,7 @@
                 </div>
             </div>`;
         document.getElementById('skillCategoryList').insertAdjacentHTML('beforeend', html);
-        initSkillSortables(); // 새 컨테이너에 Sortable 연결
+        initSkillSortables();
     }
 
     // Submit 전 전체 인덱스 정리
@@ -884,21 +983,24 @@
         }
     }
 
+    // 1. 주요 경험 추가
     function addKeyRole() {
         const idx = getSafeIndex('keyRoleList', 'keyRoles');
-
         const html = `
             <div class="list-item key-role-item d-flex align-items-center mb-2 bg-white p-2 border rounded">
                 <i class="bi bi-grip-vertical drag-handle me-2 text-secondary"></i>
                 <input type="hidden" name="keyRoles[${idx}].sortOrder" class="sort-order" value="99">
-                <div class="flex-grow-1">
-                    <input type="text" name="keyRoles[${idx}].roleContent" class="form-control" placeholder="핵심 경험을 한 줄로 요약하세요">
+                <div class="flex-grow-1 me-2">
+                    <input type="text" name="keyRoles[${idx}].roleContent" class="form-control border-0 bg-transparent" placeholder="핵심 경험을 한 줄로 요약하세요">
                 </div>
-                <button type="button" class="btn btn-outline-danger btn-sm ms-2 border-0" onclick="removeElement(this)">
+                <div class="form-check form-switch me-2">
+                    <input class="form-check-input" type="checkbox" checked onchange="this.nextElementSibling.value = this.checked">
+                    <input type="hidden" name="keyRoles[${idx}].visible" value="true">
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="removeElement(this)">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>`;
-
         document.getElementById('keyRoleList').insertAdjacentHTML('beforeend', html);
     }
 
@@ -943,9 +1045,98 @@
         initAllSortables();
     }
 
-    function addEducation() { const idx = getSafeIndex('eduList', 'educations'); const html = `<div class="list-item d-flex align-items-start mb-3 border-bottom pb-2"><i class="bi bi-grip-vertical drag-handle mt-2 me-2"></i><input type="hidden" name="educations[${idx}].sortOrder" class="sort-order" value="99"><input type="hidden" name="educations[${idx}].visible" value="true"><div class="row g-2 flex-grow-1"><div class="col-md-4"><input type="text" name="educations[${idx}].institution" class="form-control fw-bold" placeholder="학교"></div><div class="col-md-3"><input type="text" name="educations[${idx}].period" class="form-control" placeholder="기간"></div><div class="col-md-3"><input type="text" name="educations[${idx}].major" class="form-control" placeholder="전공"></div><div class="col-md-2"><input type="text" name="educations[${idx}].gpa" class="form-control" placeholder="학점"></div><div class="col-12"><textarea name="educations[${idx}].additionalInfo" class="form-control bg-light form-control-sm" rows="1"></textarea></div></div><button type="button" class="btn btn-outline-danger btn-sm ms-3" onclick="removeElement(this)">X</button></div>`; document.getElementById('eduList').insertAdjacentHTML('beforeend', html); }
-    function addCertification() { const idx = getSafeIndex('certList', 'certifications'); const html = `<div class="list-item d-flex align-items-center mb-3 border-bottom pb-2"><i class="bi bi-grip-vertical drag-handle me-2"></i><input type="hidden" name="certifications[${idx}].sortOrder" class="sort-order" value="99"><input type="hidden" name="certifications[${idx}].visible" value="true"><div class="row g-2 flex-grow-1"><div class="col-md-6"><input type="text" name="certifications[${idx}].name" class="form-control fw-bold" placeholder="자격증"></div><div class="col-md-6"><input type="text" name="certifications[${idx}].issueDate" class="form-control" placeholder="취득일"></div><div class="col-12"><input type="text" name="certifications[${idx}].additionalInfo" class="form-control bg-light form-control-sm" placeholder="상세"></div></div><button type="button" class="btn btn-outline-danger btn-sm ms-3" onclick="removeElement(this)">X</button></div>`; document.getElementById('certList').insertAdjacentHTML('beforeend', html); }
-    function addSkill() { const idx = getSafeIndex('skillList', 'skills'); const html = `<div class="col-md-6 list-item"><div class="border rounded p-3 position-relative bg-light h-100"><i class="bi bi-grip-horizontal drag-handle position-absolute top-0 end-0 m-2 text-secondary"></i><input type="hidden" name="skills[${idx}].sortOrder" class="sort-order" value="99"><div class="mb-2"><label class="small text-muted">스킬명</label><input type="text" name="skills[${idx}].name" class="form-control fw-bold"></div><div class="mb-2"><label class="small text-muted">설명</label><input type="text" name="skills[${idx}].description" class="form-control form-control-sm"></div><div class="text-end"><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeElement(this)">삭제</button></div></div></div>`; document.getElementById('skillList').insertAdjacentHTML('beforeend', html); initAllSortables(); }
+    // 학력 추가
+    function addEducation() {
+        const idx = getSafeIndex('educationList', 'educations');
+        const html = `
+            <div class="list-item bg-light border p-3 mb-3 rounded position-relative">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-grip-vertical drag-handle me-2 fs-5"></i>
+                    <input type="hidden" name="educations[${idx}].sortOrder" class="sort-order" value="99">
+
+                    <h6 class="mb-0 fw-bold">학력 정보</h6>
+
+                    <div class="ms-auto d-flex align-items-center">
+                        <div class="form-check form-switch me-2">
+                            <input class="form-check-input" type="checkbox" checked onchange="this.nextElementSibling.value = this.checked">
+                            <input type="hidden" name="educations[${idx}].visible" value="true">
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeElement(this)">삭제</button>
+                    </div>
+                </div>
+
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label class="form-label small text-muted mb-0">학교명</label>
+                        <input type="text" name="educations[${idx}].institution" class="form-control form-control-sm" placeholder="예: 한국대학교">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted mb-0">전공</label>
+                        <input type="text" name="educations[${idx}].major" class="form-control form-control-sm" placeholder="예: 컴퓨터공학">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted mb-0">학점</label>
+                        <input type="text" name="educations[${idx}].gpa" class="form-control form-control-sm" placeholder="예: 4.0/4.5">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label small text-muted mb-0">기간</label>
+                        <input type="text" name="educations[${idx}].period" class="form-control form-control-sm" placeholder="예: 2015.03 - 2022.02">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label small text-muted mb-0">추가 정보 (선택)</label>
+                        <textarea name="educations[${idx}].additionalInfo" class="form-control form-control-sm" rows="2" placeholder="졸업 논문 주제 등"></textarea>
+                    </div>
+                </div>
+            </div>`;
+
+        document.getElementById('educationList').insertAdjacentHTML('beforeend', html);
+    }
+
+    // 자격증 추가
+    function addCertification() {
+        const idx = getSafeIndex('certificationList', 'certifications');
+
+        const html = `
+            <div class="list-item bg-light border p-3 mb-2 rounded position-relative">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-grip-vertical drag-handle me-2 fs-5"></i>
+                    <input type="hidden" name="certifications[${idx}].sortOrder" class="sort-order" value="99">
+
+                    <h6 class="mb-0 fw-bold">자격증 정보</h6>
+
+                    <div class="ms-auto d-flex align-items-center">
+                        <div class="form-check form-switch me-2">
+                            <input class="form-check-input" type="checkbox" checked onchange="this.nextElementSibling.value = this.checked">
+                            <input type="hidden" name="certifications[${idx}].visible" value="true">
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeElement(this)">삭제</button>
+                    </div>
+                </div>
+
+                <div class="row g-2">
+                    <div class="col-md-8">
+                        <label class="form-label small text-muted mb-0">자격증명</label>
+                        <input type="text" name="certifications[${idx}].name" class="form-control form-control-sm" placeholder="예: 정보처리기사">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted mb-0">취득일</label>
+                        <input type="text" name="certifications[${idx}].issueDate" class="form-control form-control-sm" placeholder="예: 2023.05">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label small text-muted mb-0">추가 정보 (선택)</label>
+                        <textarea name="certifications[${idx}].additionalInfo" class="form-control form-control-sm" rows="1" placeholder="발급기관 등"></textarea>
+                    </div>
+                </div>
+            </div>`;
+
+        document.getElementById('certificationList').insertAdjacentHTML('beforeend', html);
+    }
 
     function addFullProject(cIdx) {
         const typeRadio = document.querySelector(`input[name="companyType-${cIdx}"]:checked`);
