@@ -76,19 +76,31 @@
                     <div class="col-md-4"><label class="form-label text-muted small">링크 (GitHub/Blog)</label><input type="text" th:field="*{config.github}" class="form-control"></div>
                     <div class="col-12"><label class="form-label fw-bold text-muted small">자기소개 본문</label><textarea th:field="*{config.aboutParagraph}" class="form-control" rows="4"></textarea></div>
                 </div>
+
                 <div class="mt-4">
                     <label class="form-label fw-bold mb-2">📌 주요 경험 요약 (Key Experience)</label>
                     <div id="keyRoleList" class="sortable-list">
-                        <div th:each="role, rStat : *{keyRoles}" class="list-item d-flex align-items-center mb-2">
-                            <i class="bi bi-grip-vertical drag-handle me-2"></i>
+
+                        <div th:each="role, rStat : *{keyRoles}" class="list-item key-role-item d-flex align-items-center mb-2 bg-white p-2 border rounded">
+
+                            <i class="bi bi-grip-vertical drag-handle me-2 text-secondary"></i>
+
                             <input type="hidden" th:field="*{keyRoles[__${rStat.index}__].id}">
                             <input type="hidden" class="sort-order" th:field="*{keyRoles[__${rStat.index}__].sortOrder}">
-                            <input type="hidden" th:field="*{keyRoles[__${rStat.index}__].visible}">
-                            <div class="flex-grow-1 me-2"><textarea th:field="*{keyRoles[__${rStat.index}__].roleContent}" class="form-control form-control-sm" rows="1"></textarea></div>
-                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeElement(this)"><i class="bi bi-x"></i></button>
+
+                            <div class="flex-grow-1 me-2">
+                                <input type="text" th:field="*{keyRoles[__${rStat.index}__].roleContent}" class="form-control border-0 bg-transparent" placeholder="핵심 경험을 한 줄로 요약하세요">
+                            </div>
+
+                            <button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="removeElement(this)">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
                         </div>
+
                     </div>
-                    <button type="button" class="btn btn-sm btn-link px-0 text-decoration-none" onclick="addKeyRole()"><i class="bi bi-plus-circle"></i> 경험 한 줄 추가</button>
+                    <button type="button" class="btn btn-sm btn-link px-0 text-decoration-none" onclick="addKeyRole()">
+                        <i class="bi bi-plus-circle"></i> 경험 한 줄 추가
+                    </button>
                 </div>
             </div>
 
@@ -840,31 +852,53 @@
     }
 
     function removeElement(btn) {
-        if(confirm('정말 삭제하시겠습니까? (저장 후 반영됩니다)')) {
+        if(confirm('정말 삭제하시겠습니까?')) {
             let target =
+                btn.closest('.key-role-item') ||  // 1순위: 주요 경험
+                btn.closest('.skill-item') ||     // 2순위: 스킬
                 btn.closest('.impact-item') ||
                 btn.closest('.solution-item') ||
                 btn.closest('.tech-item') ||
                 btn.closest('.episode-item') ||
                 btn.closest('.meta-item') ||
                 btn.closest('.project-item') ||
-                btn.closest('.list-item');
+                btn.closest('.list-item');        // 최후순위: 일반 리스트 아이템
 
             if(target) {
                 target.remove();
+
+                // 삭제 후 후속 작업 (정렬 및 동기화)
                 setTimeout(() => {
-                    updateSkillIndices();
-                    syncAllSkills(); // [중요] 삭제 후 스킬 동기화 실행
+                    if (typeof updateSkillIndices === 'function') updateSkillIndices();
+                    if (typeof syncAllSkills === 'function') syncAllSkills();
+
+                    const keyRoleList = document.getElementById('keyRoleList');
+                    if(keyRoleList) updateSortOrders(keyRoleList, '.sort-order');
+
                     document.querySelectorAll('.project-sortable-list').forEach(el => updateSortOrders(el, '.project-sort-order'));
                     document.querySelectorAll('.meta-sortable-list').forEach(el => updateSortOrders(el, '.meta-sort-order'));
                 }, 50);
+            } else {
+                alert('삭제할 대상을 찾지 못했습니다. (Error: Target not found)');
             }
         }
     }
 
     function addKeyRole() {
         const idx = getSafeIndex('keyRoleList', 'keyRoles');
-        const html = `<div class="list-item d-flex align-items-center mb-2"><i class="bi bi-grip-vertical drag-handle me-2"></i><input type="hidden" name="keyRoles[${idx}].sortOrder" class="sort-order" value="99"><input type="hidden" name="keyRoles[${idx}].visible" value="true"><div class="flex-grow-1 me-2"><textarea name="keyRoles[${idx}].roleContent" class="form-control form-control-sm" rows="1"></textarea></div><button type="button" class="btn btn-outline-danger btn-sm" onclick="removeElement(this)">X</button></div>`;
+
+        const html = `
+            <div class="list-item key-role-item d-flex align-items-center mb-2 bg-white p-2 border rounded">
+                <i class="bi bi-grip-vertical drag-handle me-2 text-secondary"></i>
+                <input type="hidden" name="keyRoles[${idx}].sortOrder" class="sort-order" value="99">
+                <div class="flex-grow-1">
+                    <input type="text" name="keyRoles[${idx}].roleContent" class="form-control" placeholder="핵심 경험을 한 줄로 요약하세요">
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-sm ms-2 border-0" onclick="removeElement(this)">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>`;
+
         document.getElementById('keyRoleList').insertAdjacentHTML('beforeend', html);
     }
 

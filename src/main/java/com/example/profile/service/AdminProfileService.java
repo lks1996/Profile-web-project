@@ -7,10 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor // 생성자 주입 자동화 (Autowired 생략 가능)
@@ -102,10 +100,33 @@ public class AdminProfileService {
 
         // 3. 주요 경험 (Key Roles) 저장
         if (wrapper.getKeyRoles() != null) {
-            // 내용 없는 것 제거
+            // A. 빈 데이터 정리 (내용 없는 것 제외)
             wrapper.getKeyRoles().removeIf(role ->
                     role.getRoleContent() == null || role.getRoleContent().trim().isEmpty());
+
+            // B. 삭제 대상 찾기 로직
+            // 1) 프론트에서 넘어온 ID 목록 추출 (새로 추가된 건 ID가 null이므로 제외)
+            Set<Long> inputIds = wrapper.getKeyRoles().stream()
+                    .map(KeyRole::getId)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+
+            // 2) DB에 저장된 기존 데이터 불러오기
+            List<KeyRole> existingRoles = keyRoleRepo.findAll();
+
+            // 3) (기존 데이터) - (프론트 데이터) = 삭제되어야 할 데이터
+            List<KeyRole> toDelete = existingRoles.stream()
+                    .filter(role -> !inputIds.contains(role.getId()))
+                    .collect(Collectors.toList());
+
+            // 4) 삭제 실행
+            keyRoleRepo.deleteAll(toDelete);
+
+            // C. 남은 데이터(수정+신규) 저장
             keyRoleRepo.saveAll(wrapper.getKeyRoles());
+        } else {
+            // 만약 리스트가 아예 비어서 왔다면(전체 삭제), DB 데이터도 싹 지워야 함
+            keyRoleRepo.deleteAll();
         }
 
         // 4. Companies (Projects 포함) 저장
@@ -160,6 +181,7 @@ public class AdminProfileService {
 
     /**
      * 하위 데이터 강제 초기화(Lazy Loading 해소) + 기술 스택 이름 수집
+     * 차이점: 데이터 로딩(init)은 무조건 하고, 수집(collect)만 visibility를 따름.
      */
     private Set<String> initDeepDataAndCollectTechs(List<Company> companies) {
         Set<String> techs = new HashSet<>();
@@ -167,36 +189,44 @@ public class AdminProfileService {
         if (companies == null) return techs;
 
         for (Company comp : companies) {
-
-            // [추가된 부분] 회사가 숨김(false) 상태면, 그 안의 프로젝트 스킬도 수집하지 않음
-            if (!comp.isVisible()) continue;
-
+            // 1. [초기화] 프로젝트 리스트 강제 로딩 (Lazy 해소)
             if (comp.getProjects() != null) {
+                comp.getProjects().size(); // DB 조회 트리거
+
                 for (ProjectMaster proj : comp.getProjects()) {
 
-                    // [기존] 프로젝트가 숨김 상태면 패스
-                    if (!proj.isVisible()) continue;
-
-                    // 1) MetaItems 초기화
+                    // 2. [초기화] 메타 아이템 강제 로딩
                     if (proj.getMetaItems() != null) {
+                        proj.getMetaItems().size(); // DB 조회 트리거
+
                         for (ProjectMeta meta : proj.getMetaItems()) {
 
-                            // [추가된 부분] 메타 아이템(기술스택 그룹) 자체가 숨김이면 패스
-                            if (!meta.isVisible()) continue;
-
-                            // 2) TechStack 초기화 및 수집
+                            // -------------------------------------------------
+                            // 기술 스택 수집 로직 (여기는 노출 여부 체크 필요)
+                            // -------------------------------------------------
                             if (meta.getTechStacks() != null) {
-                                for (ProjectTechStack stack : meta.getTechStacks()) {
+                                meta.getTechStacks().size(); // [초기화]
 
-                                    // [기존] 기술 태그 개별 숨김 체크
-                                    if (stack.isVisible() && stack.getTechName() != null && !stack.getTechName().trim().isEmpty()) {
+                                // 수집 조건: 회사, 프로젝트, 메타, 스택이 모두 보여야 함
+                                boolean isChainVisible = comp.isVisible() && proj.isVisible() && meta.isVisible();
+
+                                for (ProjectTechStack stack : meta.getTechStacks()) {
+                                    // 1) 데이터는 무조건 보여야 하므로 로딩은 되어 있어야 함 (위에서 size() 호출됨)
+
+                                    // 2) 스킬 풀(Pool)에 넣을지 말지는 조건부 결정
+                                    if (isChainVisible && stack.isVisible() &&
+                                            stack.getTechName() != null && !stack.getTechName().trim().isEmpty()) {
                                         techs.add(stack.getTechName().trim());
                                     }
                                 }
                             }
-                            // ... (Problems 초기화 로직 유지) ...
+
+                            // -------------------------------------------------
+                            // Problems, Solutions, Impacts 초기화 (무조건 실행)
+                            // -------------------------------------------------
                             if (meta.getProblems() != null) {
-                                meta.getProblems().size();
+                                meta.getProblems().size(); // DB 조회 트리거
+
                                 for (Problem prob : meta.getProblems()) {
                                     if (prob.getSolutions() != null) prob.getSolutions().size();
                                     if (prob.getImpacts() != null) prob.getImpacts().size();
