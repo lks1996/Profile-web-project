@@ -30,7 +30,7 @@ jobs:
       - name: 4. Run New Docker Container
         run: |
           docker run -d --restart always `
-          -p 8190:8190 `
+          -p 8290:8290 `
           -v "C:\Projects\profile-web-project\config:/config" `
           --name profile-web-project-container `
           profile-web-project --spring.config.location=file:/config/application.yml
