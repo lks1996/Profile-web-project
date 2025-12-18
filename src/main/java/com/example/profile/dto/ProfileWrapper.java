@@ -7,8 +7,8 @@ import java.util.List;
 
 @Data
 public class ProfileWrapper {
-    private ResumeConfig config;
-    private List<ResumeSection> sections = new ArrayList<>();
+    private ProfileConfig config;
+    private List<ProfileSection> sections = new ArrayList<>();
     private List<KeyRole> keyRoles = new ArrayList<>();
     private List<Company> companies = new ArrayList<>();
     private List<Education> educations = new ArrayList<>();

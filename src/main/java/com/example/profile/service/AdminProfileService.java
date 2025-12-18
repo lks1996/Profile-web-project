@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 @Transactional // 기본적으로 모든 메서드에 트랜잭션 적용
 public class AdminProfileService {
 
-    private final ResumeConfigRepository configRepo;
-    private final ResumeSectionRepository sectionRepo;
+    private final ProfileConfigRepository configRepo;
+    private final ProfileSectionRepository sectionRepo;
     private final KeyRoleRepository keyRoleRepo;
     private final CompanyRepository companyRepo;
     private final EducationRepository eduRepo;
@@ -35,8 +35,8 @@ public class AdminProfileService {
         // 1. ResumeConfig (기본 설정) 초기화
         // ================================================================
         // ID 1번 설정이 없으면 빈 객체를 만들어서 저장 후 가져옴
-        ResumeConfig config = configRepo.findById(1L).orElseGet(() -> {
-            ResumeConfig newConfig = new ResumeConfig();
+        ProfileConfig config = configRepo.findById(1L).orElseGet(() -> {
+            ProfileConfig newConfig = new ProfileConfig();
             return configRepo.save(newConfig);
         });
         wrapper.setConfig(config);
@@ -45,7 +45,7 @@ public class AdminProfileService {
         // 2. Sections (메인 섹션) 초기화
         // 섹션 데이터가 하나도 없으면 기본 5개 섹션 생성.
         // ================================================================
-        List<ResumeSection> sections = sectionRepo.findAllByOrderBySortOrderAsc();
+        List<ProfileSection> sections = sectionRepo.findAllByOrderBySortOrderAsc();
 
         if (sections.isEmpty()) {
             sections = new ArrayList<>();
@@ -90,7 +90,7 @@ public class AdminProfileService {
 
         // 2. Sections 저장
         if (wrapper.getSections() != null) {
-            for (ResumeSection section : wrapper.getSections()) {
+            for (ProfileSection section : wrapper.getSections()) {
                 if (section.getSectionName() == null || section.getSectionName().trim().isEmpty()) {
                     section.setSectionName(section.getSectionType().name());
                 }
@@ -231,8 +231,8 @@ public class AdminProfileService {
     /**
      * 이력서 양식폼 기본 섹션 생성 메서드
      */
-    private ResumeSection createDefaultSection(SectionType type, String name, int order) {
-        ResumeSection section = new ResumeSection();
+    private ProfileSection createDefaultSection(SectionType type, String name, int order) {
+        ProfileSection section = new ProfileSection();
         section.setSectionType(type);
         section.setSectionName(name);
         section.setSortOrder(order);

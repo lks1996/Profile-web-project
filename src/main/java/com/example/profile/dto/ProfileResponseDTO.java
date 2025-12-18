@@ -4,7 +4,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ResumeResponseDTO {
+public class ProfileResponseDTO {
     // 1. 헤더 및 정적 정보
     private String fullName;
     private String jobTitle;

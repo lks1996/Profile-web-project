@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${profile.config.fullName + ' - Profile'}">My Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        /* =========================================
+           1. Apple-style Typography & Base
+           ========================================= */
+        :root {
+            --bg-color: #f5f5f7; /* Apple Light Gray */
+            --card-bg: #ffffff;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-color: #0066cc; /* Apple Blue */
+            --transition-curve: cubic-bezier(0.165, 0.84, 0.44, 1); /* 부드러운 감속 */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", "Noto Sans KR", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container-narrow {
+            max-width: 800px; /* 읽기 편한 폭으로 제한 */
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* =========================================
+           2. Scroll Animations (The "Magic")
+           ========================================= */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(50px) scale(0.98);
+            transition: opacity 1s var(--transition-curve), transform 1s var(--transition-curve);
+            will-change: opacity, transform;
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* 순차적 딜레이 (리스트 아이템 등) */
+        .delay-100 { transition-delay: 0.1s; }
+        .delay-200 { transition-delay: 0.2s; }
+        .delay-300 { transition-delay: 0.3s; }
+
+        /* =========================================
+           3. Section Styling
+           ========================================= */
+        .section-block {
+            padding: 100px 0; /* 시원시원한 여백 */
+        }
+
+        .section-title {
+            font-size: 3rem; /* 아주 큰 제목 */
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 3rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .section-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-align: center;
+            margin-top: -2.5rem;
+            margin-bottom: 4rem;
+        }
+
+        /* =========================================
+           4. Component Styles
+           ========================================= */
+
+        /* Header (Hero Section) */
+        .hero-section {
+            height: 90vh; /* 화면 가득 채움 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero-name {
+            font-size: 5rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #1d1d1f 0%, #434344 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .hero-role {
+            font-size: 2rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 3rem;
+        }
+
+        .hero-contact a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            margin: 0 10px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+        .hero-contact a:hover { opacity: 0.7; }
+
+        /* Card Style (공통) */
+        .info-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+            margin-bottom: 30px;
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        /* Key Roles (Highlight) */
+        .key-role-text {
+            font-size: 1.6rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: #1d1d1f;
+        }
+        .key-role-icon { color: var(--accent-color); margin-right: 15px; }
+
+        /* Skills (Chips) */
+        .skill-group-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        .skill-chip {
+            display: inline-block;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            margin: 0 8px 12px 0;
+            transition: transform 0.2s;
+        }
+        .skill-chip:hover {
+            transform: scale(1.05);
+            background: #e8e8ed;
+        }
+
+        /* Experience (Timeline-ish) */
+        .company-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f5f5f7;
+            padding-bottom: 20px;
+        }
+        .company-name { font-size: 2.2rem; font-weight: 800; }
+        .company-type { background: #1d1d1f; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; vertical-align: middle; margin-left: 10px; }
+
+        .project-block { margin-top: 40px; }
+        .project-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 5px; }
+        .project-period { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 15px; display: block;}
+
+        .meta-group { margin-top: 20px; padding-left: 20px; border-left: 3px solid var(--accent-color); }
+        .meta-label { font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block; }
+        .meta-content { font-size: 1.05rem; line-height: 1.6; color: #333; white-space: pre-line; margin-bottom: 20px; }
+
+        /* Tech Stack */
+        .tech-badge {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            background: rgba(0, 102, 204, 0.1);
+            padding: 4px 10px;
+            border-radius: 8px;
+            margin-right: 5px;
+        }
+
+        /* Detail Items (Episode) */
+        .episode-box { background: #fafafa; border-radius: 12px; padding: 20px; margin-top: 15px; }
+        .episode-title { font-weight: 700; margin-bottom: 10px; }
+        .detail-li { margin-bottom: 6px; font-size: 1rem; position: relative; padding-left: 15px; }
+        .detail-li::before { content: "•"; position: absolute; left: 0; color: var(--text-secondary); }
+        .impact-li { color: #008844; font-weight: 600; }
+
+        /* Education & Certs */
+        .edu-item, .cert-item { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .edu-item:last-child { border-bottom: none; }
+        .item-main { font-weight: 600; font-size: 1.1rem; }
+        .item-sub { color: var(--text-secondary); font-size: 0.95rem; }
+
+    </style>
+</head>
+<body>
+
+<section class="hero-section reveal-on-scroll">
+    <div class="container-narrow">
+        <h1 class="hero-name" th:text="${profile.config.fullName}">Name</h1>
+        <div class="hero-role" th:text="${profile.config.companyRoleLabel}">Job Title</div>
+
+        <div class="hero-contact mt-4">
+            <a th:if="${profile.config.phone}" href="#" th:text="${profile.config.phone}"><i class="bi bi-telephone"></i></a>
+            <a th:if="${profile.config.email}" th:href="'mailto:' + ${profile.config.email}" th:text="${profile.config.email}"><i class="bi bi-envelope"></i></a>
+            <a th:if="${profile.config.github}" th:href="${profile.config.github}" target="_blank">GitHub <i class="bi bi-arrow-up-right"></i></a>
+        </div>
+
+        <div style="margin-top: 100px; opacity: 0.5; animation: bounce 2s infinite;">
+            <i class="bi bi-chevron-down fs-3"></i>
+        </div>
+    </div>
+</section>
+
+<section class="section-block" th:if="${profile.config.aboutParagraph != null}">
+    <div class="container-narrow">
+        <h2 class="section-title reveal-on-scroll">About Me</h2>
+        <div class="info-card reveal-on-scroll">
+            <p style="font-size: 1.3rem; line-height: 1.8; color: #444; white-space: pre-line;"
+               th:text="${profile.config.aboutParagraph}">자기소개</p>
+        </div>
+    </div>
+</section>
+
+<section class="section-block" th:if="${not #lists.isEmpty(profile.keyRoles)}">
+    <div class="container-narrow">
+        <h2 class="section-title reveal-on-scroll">Key Highlights</h2>
+        <div class="d-flex flex-column gap-4">
+            <div th:each="role : ${profile.keyRoles}" class="info-card reveal-on-scroll d-flex align-items-center">
+                <i class="bi bi-check-circle-fill key-role-icon fs-3"></i>
+                <span class="key-role-text" th:text="${role.roleContent}">핵심 역량</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block" th:if="${not #lists.isEmpty(profile.skillCategories)}">
+    <div class="container-narrow">
+        <h2 class="section-title reveal-on-scroll">Technical Skills</h2>
+
+        <div class="info-card reveal-on-scroll">
+            <div th:each="cat : ${profile.skillCategories}" class="mb-4 reveal-on-scroll delay-100">
+                <div class="skill-group-title" th:text="${cat.name}">Category</div>
+                <div>
+                    <span th:each="skill : ${cat.skills}" class="skill-chip" th:text="${skill.name}">Skill</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block" th:if="${not #lists.isEmpty(profile.companies)}">
+    <div class="container-narrow">
+        <h2 class="section-title reveal-on-scroll">Work Experience</h2>
+        <div class="section-subtitle reveal-on-scroll delay-100">Journey of building products</div>
+
+        <div th:each="comp : ${profile.companies}" class="reveal-on-scroll" style="margin-bottom: 120px;">
+
+            <div class="company-header">
+                <div>
+                    <span class="company-name" th:text="${comp.name}">Company</span>
+                    <span class="company-type" th:text="${comp.type}">WORK</span>
+                </div>
+                <!--<div class="text-secondary fw-bold" style="font-size: 1.1rem;" th:text="${comp.period}">Period</div>-->
+            </div>
+
+            <div class="info-card">
+                <div th:each="proj : ${comp.projects}" class="project-block reveal-on-scroll delay-100">
+                    <h3 class="project-title" th:text="${proj.title}">Project Title</h3>
+
+                    <div th:each="meta : ${proj.metaItems}">
+
+                        <span th:if="${meta.itemType.toString() == 'DURATION'}" class="project-period" th:text="${meta.content}">2022.01 - 2023.01</span>
+
+                        <div th:if="${meta.itemType.toString() == 'SUMMARY'}" class="meta-content" th:text="${meta.content}">요약 내용</div>
+
+                        <div th:if="${meta.itemType.toString() == 'TECH_STACK_GROUP'}" class="mb-4">
+                            <span th:each="stack : ${meta.techStacks}" class="tech-badge" th:text="${stack.techName}">Java</span>
+                        </div>
+
+                        <div th:if="${meta.itemType.toString() == 'CONTENT_GROUP'}" class="meta-group">
+                            <div th:each="prob : ${meta.problems}" class="episode-box">
+                                <div class="episode-title text-dark" th:if="${prob.title}" th:text="${prob.title}">Problem Definition</div>
+
+                                <div th:if="${not #lists.isEmpty(prob.solutions)}" class="mb-2">
+                                    <div class="meta-label" style="font-size:0.75rem;">SOLUTIONS</div>
+                                    <div th:each="sol : ${prob.solutions}" class="detail-li" th:text="${sol.content}">Solution</div>
+                                </div>
+
+                                <div th:if="${not #lists.isEmpty(prob.impacts)}">
+                                    <div class="meta-label" style="font-size:0.75rem; color:#008844;">IMPACT</div>
+                                    <div th:each="imp : ${prob.impacts}" class="detail-li impact-li" th:text="${imp.content}">Impact</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div> </div> </div> </div> </div>
+</section>
+
+<section class="section-block" style="background-color: #fff; border-top: 1px solid #eee;">
+    <div class="container-narrow" style="padding-top: 50px;">
+        <div class="row">
+            <div class="col-md-6 reveal-on-scroll">
+                <h3 class="mb-4 fw-bold">Education</h3>
+                <div th:each="edu : ${profile.educations}" class="edu-item">
+                    <div>
+                        <div class="item-main" th:text="${edu.institution}">School</div>
+                        <div class="item-sub">
+                            <span th:text="${edu.major}">Major</span>
+                            <span th:if="${edu.gpa}" th:text="| (${edu.gpa})|"></span>
+                        </div>
+                        <div class="item-sub mt-1" th:if="${edu.additionalInfo}" th:text="${edu.additionalInfo}" style="font-size:0.85rem"></div>
+                    </div>
+                    <div class="text-end item-sub" style="min-width: 100px;" th:text="${edu.period}">Period</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 reveal-on-scroll delay-200">
+                <h3 class="mb-4 fw-bold">Certifications</h3>
+                <div th:each="cert : ${profile.certifications}" class="cert-item">
+                    <div>
+                        <div class="item-main" th:text="${cert.name}">Cert Name</div>
+                        <div class="item-sub" th:if="${cert.additionalInfo}" th:text="${cert.additionalInfo}">Info</div>
+                    </div>
+                    <div class="text-end item-sub" th:text="${cert.issueDate}">Date</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5 pt-5 pb-5 text-secondary" style="font-size: 0.9rem; opacity: 0.6;">
+            © <span th:text="${#calendars.format(#calendars.createNow(), 'yyyy')}">2025</span>
+            <span th:text="${profile.config.fullName}">Name</span>. All rights reserved.
+        </div>
+    </div>
+</section>
+
+<script>
+    // ============================================
+    // Scroll-Driven Animation Logic
+    // ============================================
+    document.addEventListener("DOMContentLoaded", function() {
+
+        // 1. 관찰자(Observer) 옵션 설정
+        const observerOptions = {
+            root: null,         // 뷰포트 기준
+            rootMargin: '0px',
+            threshold: 0.15     // 요소가 15% 보일 때 트리거
+        };
+
+        // 2. 관찰자 콜백 함수
+        const observerCallback = (entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // 화면에 들어오면 .is-visible 클래스 추가
+                    entry.target.classList.add('is-visible');
+
+                    // (선택) 한 번 보여지면 관찰 중단할지 여부
+                    // observer.unobserve(entry.target);
+                }
+            });
+        };
+
+        // 3. 관찰자 생성
+        const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+        // 4. 모든 타겟 요소(.reveal-on-scroll) 등록
+        const revealElements = document.querySelectorAll('.reveal-on-scroll');
+        revealElements.forEach(el => observer.observe(el));
+    });
+</script>
+
+<style>
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+        40% {transform: translateY(-10px);}
+        60% {transform: translateY(-5px);}
+    }
+</style>
+</body>
+</html>

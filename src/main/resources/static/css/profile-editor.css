@@ -1,0 +1,19 @@
+body { background-color: #f4f6f9; padding-bottom: 100px; }
+.section-card { border: none; border-radius: 12px; transition: transform 0.2s; }
+
+/* 드래그 핸들 스타일 */
+.drag-handle, .drag-handle-root { cursor: grab; color: #adb5bd; }
+.drag-handle:active, .drag-handle-root:active { cursor: grabbing; color: #495057; }
+
+.list-item, .project-item, .meta-item, .tech-item { transition: background-color 0.2s; }
+.sortable-ghost { opacity: 0.4; background-color: #e9ecef !important; border: 2px dashed #ced4da; }
+
+/* 중첩 리스트 시각적 구분 */
+.project-sortable-list { min-height: 10px; }
+.solution-sortable-list, .impact-sortable-list { min-height: 5px; }
+
+/* 텍스트 영역 리사이즈 방지 */
+textarea {
+    resize: vertical;
+    min-height: 38px; /* 최소 높이 설정 */
+}

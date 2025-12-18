@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "resume_section")
-public class ResumeSection {
+public class ProfileSection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
