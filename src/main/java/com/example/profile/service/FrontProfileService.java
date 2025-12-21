@@ -1,7 +1,7 @@
 package com.example.profile.service;
 
+import com.example.profile.dto.ProfileWrapper;
 import com.example.profile.model.*;
-import com.example.profile.dto.*;
 import com.example.profile.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class FrontProfileService {
 
     private final ProfileConfigRepository configRepo;
+    private final ProfileSectionRepository sectionRepo; // 섹션 레포지토리 추가
     private final KeyRoleRepository keyRoleRepo;
     private final SkillCategoryRepository skillCategoryRepo;
     private final CompanyRepository companyRepo;
@@ -26,23 +27,30 @@ public class FrontProfileService {
     public ProfileWrapper getPublicProfile() {
         ProfileWrapper wrapper = new ProfileWrapper();
 
+        // 0. Sections (섹션 순서 및 노출 여부 결정)
+        List<ProfileSection> sections = sectionRepo.findAll().stream()
+                .filter(ProfileSection::isVisible) // 숨김 처리된 섹션 제외
+                .sorted(Comparator.comparingInt(ProfileSection::getSortOrder)) // 섹션 순서대로 정렬
+                .collect(Collectors.toList());
+        wrapper.setSections(sections);
+
         // 1. Config
         wrapper.setConfig(configRepo.findAll().stream().findFirst().orElse(new ProfileConfig()));
 
-        // 2. Key Roles
+        // 2. Key Roles (필터링 + 정렬)
         List<KeyRole> roles = keyRoleRepo.findAll().stream()
                 .filter(KeyRole::isVisible)
                 .sorted(Comparator.comparingInt(KeyRole::getSortOrder))
                 .collect(Collectors.toList());
         wrapper.setKeyRoles(roles);
 
-        // 3. Skills
+        // 3. Skills (필터링 + 정렬)
         List<SkillCategory> categories = skillCategoryRepo.findAll().stream()
                 .filter(SkillCategory::isVisible)
                 .sorted(Comparator.comparingInt(SkillCategory::getSortOrder))
                 .peek(cat -> {
                     List<Skill> visibleSkills = cat.getSkills().stream()
-                            .filter(Skill::isVisible)
+                            .filter(Skill::isVisible) // 스킬 개별 숨김 적용
                             .sorted(Comparator.comparingInt(Skill::getSortOrder))
                             .collect(Collectors.toList());
                     cat.setSkills(visibleSkills);
@@ -50,7 +58,7 @@ public class FrontProfileService {
                 .collect(Collectors.toList());
         wrapper.setSkillCategories(categories);
 
-        // 4. Company -> Project -> Meta -> (Tech, Problems -> Sol/Imp)
+        // 4. Experience (필터링 + 정렬)
         List<Company> companies = companyRepo.findAll().stream()
                 .filter(Company::isVisible)
                 .sorted(Comparator.comparingInt(Company::getSortOrder))
@@ -63,42 +71,20 @@ public class FrontProfileService {
                                         .filter(ProjectMeta::isVisible)
                                         .sorted(Comparator.comparingInt(ProjectMeta::getSortOrder))
                                         .peek(meta -> {
-                                            // [중요] 여기서 Lazy Loading된 컬렉션들을 강제로 접근해서 초기화해야 합니다.
-
-                                            // 4-1. 기술 스택 (TechStacks) 필터링
                                             if (meta.getTechStacks() != null) {
-                                                List<ProjectTechStack> visibleTechs = meta.getTechStacks().stream()
+                                                meta.setTechStacks(meta.getTechStacks().stream()
                                                         .filter(ProjectTechStack::isVisible)
                                                         .sorted(Comparator.comparingInt(ProjectTechStack::getSortOrder))
-                                                        .collect(Collectors.toList());
-                                                meta.setTechStacks(visibleTechs);
+                                                        .collect(Collectors.toList()));
                                             }
-
-                                            // 4-2. 문제 해결 (Problems) 초기화 및 하위 필터링
-                                            // *Problems 자체는 Visible 필드가 없으므로 모두 가져오되, 그 안의 Solution/Impact는 필터링*
                                             if (meta.getProblems() != null) {
-                                                List<Problem> problems = meta.getProblems().stream()
+                                                meta.setProblems(meta.getProblems().stream()
                                                         .sorted(Comparator.comparingInt(Problem::getSortOrder))
                                                         .peek(prob -> {
-                                                            // Solutions 필터링
-                                                            if (prob.getSolutions() != null) {
-                                                                List<Solution> visibleSols = prob.getSolutions().stream()
-                                                                        .filter(Solution::isVisible)
-                                                                        .sorted(Comparator.comparingInt(Solution::getSortOrder))
-                                                                        .collect(Collectors.toList());
-                                                                prob.setSolutions(visibleSols);
-                                                            }
-                                                            // Impacts 필터링
-                                                            if (prob.getImpacts() != null) {
-                                                                List<Impact> visibleImps = prob.getImpacts().stream()
-                                                                        .filter(Impact::isVisible)
-                                                                        .sorted(Comparator.comparingInt(Impact::getSortOrder))
-                                                                        .collect(Collectors.toList());
-                                                                prob.setImpacts(visibleImps);
-                                                            }
+                                                            if(prob.getSolutions() != null) prob.setSolutions(prob.getSolutions().stream().filter(Solution::isVisible).sorted(Comparator.comparingInt(Solution::getSortOrder)).collect(Collectors.toList()));
+                                                            if(prob.getImpacts() != null) prob.setImpacts(prob.getImpacts().stream().filter(Impact::isVisible).sorted(Comparator.comparingInt(Impact::getSortOrder)).collect(Collectors.toList()));
                                                         })
-                                                        .collect(Collectors.toList());
-                                                meta.setProblems(problems);
+                                                        .collect(Collectors.toList()));
                                             }
                                         })
                                         .collect(Collectors.toList());
@@ -110,14 +96,14 @@ public class FrontProfileService {
                 .collect(Collectors.toList());
         wrapper.setCompanies(companies);
 
-        // 5. Education
+        // 5. Education (필터링 + 정렬)
         List<Education> educations = educationRepo.findAll().stream()
                 .filter(Education::isVisible)
                 .sorted(Comparator.comparingInt(Education::getSortOrder))
                 .collect(Collectors.toList());
         wrapper.setEducations(educations);
 
-        // 6. Certification
+        // 6. Certification (필터링 + 정렬)
         List<Certification> certifications = certificationRepo.findAll().stream()
                 .filter(Certification::isVisible)
                 .sorted(Comparator.comparingInt(Certification::getSortOrder))

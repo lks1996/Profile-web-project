@@ -229,96 +229,91 @@
     </div>
 </section>
 
-<section class="section-block" th:if="${profile.config.aboutParagraph != null}">
-    <div class="container-narrow">
-        <h2 class="section-title reveal-on-scroll">About Me</h2>
-        <div class="info-card reveal-on-scroll">
-            <p style="font-size: 1.3rem; line-height: 1.8; color: #444; white-space: pre-line;"
-               th:text="${profile.config.aboutParagraph}">자기소개</p>
-        </div>
-    </div>
-</section>
+<th:block th:each="sec : ${profile.sections}">
 
-<section class="section-block" th:if="${not #lists.isEmpty(profile.keyRoles)}">
-    <div class="container-narrow">
-        <h2 class="section-title reveal-on-scroll">Key Highlights</h2>
-        <div class="d-flex flex-column gap-4">
-            <div th:each="role : ${profile.keyRoles}" class="info-card reveal-on-scroll d-flex align-items-center">
-                <i class="bi bi-check-circle-fill key-role-icon fs-3"></i>
-                <span class="key-role-text" th:text="${role.roleContent}">핵심 역량</span>
+    <section class="section-block" th:if="${sec.sectionType.name() == 'ABOUT'}">
+        <div class="container-narrow">
+            <div th:if="${profile.config.aboutParagraph != null}">
+                <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionName != null ? sec.sectionName : 'About Me'}">About Me</h2>
+                <div class="info-card reveal-on-scroll">
+                    <p style="font-size: 1.3rem; line-height: 1.8; color: #444; white-space: pre-line;"
+                       th:text="${profile.config.aboutParagraph}">자기소개</p>
+                </div>
             </div>
-        </div>
-    </div>
-</section>
 
-<section class="section-block" th:if="${not #lists.isEmpty(profile.skillCategories)}">
-    <div class="container-narrow">
-        <h2 class="section-title reveal-on-scroll">Technical Skills</h2>
-
-        <div class="info-card reveal-on-scroll">
-            <div th:each="cat : ${profile.skillCategories}" class="mb-4 reveal-on-scroll delay-100">
-                <div class="skill-group-title" th:text="${cat.name}">Category</div>
-                <div>
-                    <span th:each="skill : ${cat.skills}" class="skill-chip" th:text="${skill.name}">Skill</span>
+            <div th:if="${not #lists.isEmpty(profile.keyRoles)}" class="mt-5">
+                <h3 class="fw-bold mb-4 reveal-on-scroll" style="color:var(--text-secondary)">Key Highlights</h3>
+                <div class="d-flex flex-column gap-4">
+                    <div th:each="role : ${profile.keyRoles}" class="info-card reveal-on-scroll d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill key-role-icon fs-3"></i>
+                        <span class="key-role-text" th:text="${role.roleContent}">핵심 역량</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="section-block" th:if="${not #lists.isEmpty(profile.companies)}">
-    <div class="container-narrow">
-        <h2 class="section-title reveal-on-scroll">Work Experience</h2>
-        <div class="section-subtitle reveal-on-scroll delay-100">Journey of building products</div>
-
-        <div th:each="comp : ${profile.companies}" class="reveal-on-scroll" style="margin-bottom: 120px;">
-
-            <div class="company-header">
-                <div>
-                    <span class="company-name" th:text="${comp.name}">Company</span>
-                    <span class="company-type" th:text="${comp.type}">WORK</span>
+    <section class="section-block" th:if="${sec.sectionType.name() == 'SKILLS' and not #lists.isEmpty(profile.skillCategories)}">
+        <div class="container-narrow">
+            <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionName != null ? sec.sectionName : 'Technical Skills'}">Skills</h2>
+            <div class="info-card reveal-on-scroll">
+                <div th:each="cat : ${profile.skillCategories}" class="mb-4 reveal-on-scroll delay-100">
+                    <div class="skill-group-title" th:text="${cat.name}">Category</div>
+                    <div>
+                        <span th:each="skill : ${cat.skills}" class="skill-chip" th:text="${skill.name}">Skill</span>
+                    </div>
                 </div>
-                <!--<div class="text-secondary fw-bold" style="font-size: 1.1rem;" th:text="${comp.period}">Period</div>-->
             </div>
+        </div>
+    </section>
 
-            <div class="info-card">
-                <div th:each="proj : ${comp.projects}" class="project-block reveal-on-scroll delay-100">
-                    <h3 class="project-title" th:text="${proj.title}">Project Title</h3>
+    <section class="section-block" th:if="${sec.sectionType.name() == 'PROJECTS' and not #lists.isEmpty(profile.companies)}">
+        <div class="container-narrow">
+            <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionName != null ? sec.sectionName : 'Work Experience'}">Experience</h2>
+            <div class="section-subtitle reveal-on-scroll delay-100">Journey of building products</div>
 
-                    <div th:each="meta : ${proj.metaItems}">
+            <div th:each="comp : ${profile.companies}" class="reveal-on-scroll" style="margin-bottom: 120px;">
+                <div class="company-header">
+                    <div>
+                        <span class="company-name" th:text="${comp.name}">Company</span>
+                        <span class="company-type" th:text="${comp.type}">WORK</span>
+                    </div>
+                </div>
 
-                        <span th:if="${meta.itemType.toString() == 'DURATION'}" class="project-period" th:text="${meta.content}">2022.01 - 2023.01</span>
+                <div class="info-card">
+                    <div th:each="proj : ${comp.projects}" class="project-block reveal-on-scroll delay-100">
+                        <h3 class="project-title" th:text="${proj.title}">Project Title</h3>
 
-                        <div th:if="${meta.itemType.toString() == 'SUMMARY'}" class="meta-content" th:text="${meta.content}">요약 내용</div>
-
-                        <div th:if="${meta.itemType.toString() == 'TECH_STACK_GROUP'}" class="mb-4">
-                            <span th:each="stack : ${meta.techStacks}" class="tech-badge" th:text="${stack.techName}">Java</span>
-                        </div>
-
-                        <div th:if="${meta.itemType.toString() == 'CONTENT_GROUP'}" class="meta-group">
-                            <div th:each="prob : ${meta.problems}" class="episode-box">
-                                <div class="episode-title text-dark" th:if="${prob.title}" th:text="${prob.title}">Problem Definition</div>
-
-                                <div th:if="${not #lists.isEmpty(prob.solutions)}" class="mb-2">
-                                    <div class="meta-label" style="font-size:0.75rem;">SOLUTIONS</div>
-                                    <div th:each="sol : ${prob.solutions}" class="detail-li" th:text="${sol.content}">Solution</div>
-                                </div>
-
-                                <div th:if="${not #lists.isEmpty(prob.impacts)}">
-                                    <div class="meta-label" style="font-size:0.75rem; color:#008844;">IMPACT</div>
-                                    <div th:each="imp : ${prob.impacts}" class="detail-li impact-li" th:text="${imp.content}">Impact</div>
+                        <div th:each="meta : ${proj.metaItems}">
+                            <span th:if="${meta.itemType.toString() == 'DURATION'}" class="project-period" th:text="${meta.content}">Period</span>
+                            <div th:if="${meta.itemType.toString() == 'SUMMARY'}" class="meta-content" th:text="${meta.content}">Summary</div>
+                            <div th:if="${meta.itemType.toString() == 'TECH_STACK_GROUP'}" class="mb-4">
+                                <span th:each="stack : ${meta.techStacks}" class="tech-badge" th:text="${stack.techName}">Java</span>
+                            </div>
+                            <div th:if="${meta.itemType.toString() == 'CONTENT_GROUP'}" class="meta-group">
+                                <div th:each="prob : ${meta.problems}" class="episode-box">
+                                    <div class="episode-title text-dark" th:if="${prob.title}" th:text="${prob.title}">Problem</div>
+                                    <div th:if="${not #lists.isEmpty(prob.solutions)}" class="mb-2">
+                                        <div class="meta-label" style="font-size:0.75rem;">SOLUTIONS</div>
+                                        <div th:each="sol : ${prob.solutions}" class="detail-li" th:text="${sol.content}">Solution</div>
+                                    </div>
+                                    <div th:if="${not #lists.isEmpty(prob.impacts)}">
+                                        <div class="meta-label" style="font-size:0.75rem; color:#008844;">IMPACT</div>
+                                        <div th:each="imp : ${prob.impacts}" class="detail-li impact-li" th:text="${imp.content}">Impact</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                    </div> </div> </div> </div> </div>
-</section>
-
-<section class="section-block" style="background-color: #fff; border-top: 1px solid #eee;">
-    <div class="container-narrow" style="padding-top: 50px;">
-        <div class="row">
-            <div class="col-md-6 reveal-on-scroll">
-                <h3 class="mb-4 fw-bold">Education</h3>
+    <section class="section-block" th:if="${sec.sectionType.name() == 'EDUCATION' and not #lists.isEmpty(profile.educations)}">
+        <div class="container-narrow">
+            <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionName != null ? sec.sectionName : 'Education'}">Education</h2>
+            <div class="info-card reveal-on-scroll">
                 <div th:each="edu : ${profile.educations}" class="edu-item">
                     <div>
                         <div class="item-main" th:text="${edu.institution}">School</div>
@@ -331,67 +326,44 @@
                     <div class="text-end item-sub" style="min-width: 100px;" th:text="${edu.period}">Period</div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="col-md-6 reveal-on-scroll delay-200">
-                <h3 class="mb-4 fw-bold">Certifications</h3>
+    <section class="section-block" th:if="${sec.sectionType.name() == 'CERTIFICATION' and not #lists.isEmpty(profile.certifications)}">
+        <div class="container-narrow">
+            <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionName != null ? sec.sectionName : 'Certifications'}">Certifications</h2>
+            <div class="info-card reveal-on-scroll">
                 <div th:each="cert : ${profile.certifications}" class="cert-item">
                     <div>
-                        <div class="item-main" th:text="${cert.name}">Cert Name</div>
+                        <div class="item-main" th:text="${cert.name}">Name</div>
                         <div class="item-sub" th:if="${cert.additionalInfo}" th:text="${cert.additionalInfo}">Info</div>
                     </div>
                     <div class="text-end item-sub" th:text="${cert.issueDate}">Date</div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="text-center mt-5 pt-5 pb-5 text-secondary" style="font-size: 0.9rem; opacity: 0.6;">
-            © <span th:text="${#calendars.format(#calendars.createNow(), 'yyyy')}">2025</span>
-            <span th:text="${profile.config.fullName}">Name</span>. All rights reserved.
-        </div>
+</th:block>
+
+<section class="section-block" style="border-top: 1px solid #eee; background: #fff;">
+    <div class="container-narrow text-center text-secondary" style="font-size: 0.9rem; opacity: 0.6;">
+        © <span th:text="${#calendars.format(#calendars.createNow(), 'yyyy')}">2025</span>
+        <span th:text="${profile.config.fullName}">Name</span>. All rights reserved.
     </div>
 </section>
 
 <script>
-    // ============================================
-    // Scroll-Driven Animation Logic
-    // ============================================
     document.addEventListener("DOMContentLoaded", function() {
-
-        // 1. 관찰자(Observer) 옵션 설정
-        const observerOptions = {
-            root: null,         // 뷰포트 기준
-            rootMargin: '0px',
-            threshold: 0.15     // 요소가 15% 보일 때 트리거
-        };
-
-        // 2. 관찰자 콜백 함수
+        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
         const observerCallback = (entries, observer) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    // 화면에 들어오면 .is-visible 클래스 추가
-                    entry.target.classList.add('is-visible');
-
-                    // (선택) 한 번 보여지면 관찰 중단할지 여부
-                    // observer.unobserve(entry.target);
-                }
+                if (entry.isIntersecting) entry.target.classList.add('is-visible');
             });
         };
-
-        // 3. 관찰자 생성
         const observer = new IntersectionObserver(observerCallback, observerOptions);
-
-        // 4. 모든 타겟 요소(.reveal-on-scroll) 등록
-        const revealElements = document.querySelectorAll('.reveal-on-scroll');
-        revealElements.forEach(el => observer.observe(el));
+        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
     });
 </script>
-
-<style>
-    @keyframes bounce {
-        0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-        40% {transform: translateY(-10px);}
-        60% {transform: translateY(-5px);}
-    }
-</style>
 </body>
 </html>

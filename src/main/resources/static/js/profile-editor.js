@@ -145,6 +145,21 @@ function initAllSortables() {
         document.querySelectorAll(sel.cls).forEach(el => initSortableElement(el, '.drag-handle', sel.input));
     });
 
+    // [카테고리 리스트 정렬 초기화]
+    const skillCatList = document.getElementById('skillCategoryList');
+    if (skillCatList && !skillCatList.getAttribute('data-sortable-init')) {
+        new Sortable(skillCatList, {
+            handle: '.drag-handle',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd: function () {
+                updateSortOrders(skillCatList, '.sort-order');
+                updateSkillIndices(); // ★ 카테고리 순서 변경 시 내부 스킬 인덱스도 갱신
+            }
+        });
+        skillCatList.setAttribute('data-sortable-init', 'true');
+    }
+
     initSkillSortables();
 }
 
@@ -178,21 +193,26 @@ function initSkillSortables() {
     }
 
     document.querySelectorAll('.skill-sortable-list').forEach(el => {
-        if (!el.getAttribute('data-init')) {
-            new Sortable(el, {
-                group: 'shared-skills',
-                animation: 150,
-                ghostClass: 'sortable-ghost',
-                onAdd: function(evt) {
-                    transformChipToInput(evt.item);
-                    updateSkillIndices();
-                    setTimeout(syncAllSkills, 50);
-                },
-                onUpdate: function() { updateSkillIndices(); },
-                onRemove: function() { updateSkillIndices(); setTimeout(syncAllSkills, 50); }
-            });
-            el.setAttribute('data-init', 'true');
-        }
+        new Sortable(el, {
+            group: 'shared-skills',
+            animation: 150,
+            ghostClass: 'bg-info',
+            onEnd: function (evt) {
+                if (evt.from !== evt.to) {
+                    const itemEl = evt.item;
+                    // 이동 시 ID/Version 초기화 (충돌 방지)
+                    const idInput = itemEl.querySelector('input[name*=".id"]');
+                    if (idInput) idInput.value = "";
+                    const verInput = itemEl.querySelector('input[name*=".version"]');
+                    if (verInput) verInput.value = "";
+                }
+                updateSkillIndices();
+            },
+            onAdd: function (evt) {
+                transformChipToInput(evt.item);
+                updateSkillIndices();
+            }
+        });
     });
 }
 
@@ -207,6 +227,8 @@ function transformChipToInput(item) {
         <input type="hidden" name="visible" value="true">
         <span class="me-2">${skillName}</span>
         <input type="hidden" class="real-name-input" value="${skillName}">
+        <input type="hidden" class="skill-id" value="">
+        <input type="hidden" class="skill-version" value="">
         <i class="bi bi-x-circle-fill ms-1 text-white-50" style="cursor: pointer;" onclick="removeElement(this)"></i>
     `;
 }
@@ -220,26 +242,56 @@ function addManualSkillToPool() {
     input.value = '';
 }
 
+// [핵심 수정 함수] 기존 스킬 + 신규 스킬 모두 인덱스 업데이트
 function updateSkillIndices() {
     const categories = document.getElementById('skillCategoryList').children;
+
     Array.from(categories).forEach((cat, cIdx) => {
+        // 1. 카테고리 자체 인덱스
+        const catNameInput = cat.querySelector('.card-header input[name*=".name"]');
+        if(catNameInput) catNameInput.name = `skillCategories[${cIdx}].name`;
+
+        const catVisInput = cat.querySelector('.card-header input[name*=".visible"]');
+        if(catVisInput) catVisInput.name = `skillCategories[${cIdx}].visible`;
+
+        const catSortInput = cat.querySelector('.card-header .sort-order');
+        if(catSortInput) {
+            catSortInput.value = cIdx;
+            catSortInput.name = `skillCategories[${cIdx}].sortOrder`;
+        }
+
+        const catIdInput = cat.querySelector('.card-header input[name*=".id"]');
+        if(catIdInput) catIdInput.name = `skillCategories[${cIdx}].id`;
+
+        // 2. 내부 스킬 인덱스
         const skillList = cat.querySelector('.skill-sortable-list');
         if (skillList) {
             Array.from(skillList.children).forEach((skill, sIdx) => {
-                const sortInput = skill.querySelector('.skill-sort-order');
-                if(sortInput) sortInput.value = sIdx;
-                if(sortInput) sortInput.name = `skillCategories[${cIdx}].skills[${sIdx}].sortOrder`;
 
-                const nameInput = skill.querySelector('.real-name-input');
+                // (A) SortOrder
+                const sortInput = skill.querySelector('.skill-sort-order');
+                if(sortInput) {
+                    sortInput.value = sIdx;
+                    sortInput.name = `skillCategories[${cIdx}].skills[${sIdx}].sortOrder`;
+                }
+
+                // (B) Name - ★[수정] 기존(Thymeleaf) input과 신규(JS) input 모두 찾아서 처리
+                // .real-name-input은 신규 항목, input[name*=".name"]은 기존 항목
+                const nameInput = skill.querySelector('.real-name-input') || skill.querySelector('input[name*=".name"]');
                 if(nameInput) nameInput.name = `skillCategories[${cIdx}].skills[${sIdx}].name`;
 
-                const idInput = skill.querySelector('input[name*=".id"]');
+                // (C) ID - ★[수정] 기존/신규 모두 처리
+                const idInput = skill.querySelector('.skill-id') || skill.querySelector('input[name*=".id"]');
                 if(idInput) idInput.name = `skillCategories[${cIdx}].skills[${sIdx}].id`;
 
-                const visInput = skill.querySelector('input[name="visible"]');
+                // (D) Version - ★[수정] 기존/신규 모두 처리
+                const versionInput = skill.querySelector('.skill-version') || skill.querySelector('input[name*=".version"]');
+                if(versionInput) versionInput.name = `skillCategories[${cIdx}].skills[${sIdx}].version`;
+
+                // (E) Visible
+                // name="visible" (신규) 또는 name="...visible" (기존)
+                const visInput = skill.querySelector('input[name="visible"]') || skill.querySelector('input[name*=".visible"]');
                 if(visInput) visInput.name = `skillCategories[${cIdx}].skills[${sIdx}].visible`;
-                const boundVisInput = skill.querySelector('input[name*=".visible"]');
-                if(boundVisInput) boundVisInput.name = `skillCategories[${cIdx}].skills[${sIdx}].visible`;
             });
         }
     });
@@ -266,6 +318,7 @@ document.getElementById('profileForm').addEventListener('submit', function() {
 });
 
 function updateSortOrders(container, inputSelector) {
+    if(!container) return;
     Array.from(container.children).forEach((item, index) => {
         const input = item.querySelector(inputSelector);
         if(input) input.value = index;
@@ -324,6 +377,7 @@ function removeElement(btn) {
 // --------------------------------------------------------------------------------
 // [HTML 생성 함수들] - 동적 추가
 // --------------------------------------------------------------------------------
+// (이하 함수들은 변경사항 없습니다. 기존 소스와 동일하게 유지하시면 됩니다.)
 function addKeyRole() {
     const idx = getSafeIndex('keyRoleList', 'keyRoles');
     const html = `
