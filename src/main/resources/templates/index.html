@@ -4,237 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${profile.config.fullName + ' - Profile'}">My Profile</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <style>
-        /* =========================================
-           1. Apple-style Typography & Base
-           ========================================= */
-        :root {
-            --bg-color: #f5f5f7; /* Apple Light Gray */
-            --card-bg: #ffffff;
-            --text-primary: #1d1d1f;
-            --text-secondary: #86868b;
-            --accent-color: #0066cc; /* Apple Blue */
-            --transition-curve: cubic-bezier(0.165, 0.84, 0.44, 1); /* 부드러운 감속 */
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", "Noto Sans KR", sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .container-narrow {
-            max-width: 800px; /* 읽기 편한 폭으로 제한 */
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* =========================================
-           2. Scroll Animations (The "Magic")
-           ========================================= */
-        .reveal-on-scroll {
-            opacity: 0;
-            transform: translateY(50px) scale(0.98);
-            transition: opacity 1s var(--transition-curve), transform 1s var(--transition-curve);
-            will-change: opacity, transform;
-        }
-
-        .reveal-on-scroll.is-visible {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-
-        /* 순차적 딜레이 (리스트 아이템 등) */
-        .delay-100 { transition-delay: 0.1s; }
-        .delay-200 { transition-delay: 0.2s; }
-        .delay-300 { transition-delay: 0.3s; }
-
-        /* =========================================
-           3. Section Styling
-           ========================================= */
-        .section-block {
-            padding: 100px 0; /* 시원시원한 여백 */
-        }
-
-        .section-title {
-            font-size: 3rem; /* 아주 큰 제목 */
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 3rem;
-            color: var(--text-primary);
-            text-align: center;
-        }
-
-        .section-subtitle {
-            font-size: 1.5rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-            text-align: center;
-            margin-top: -2.5rem;
-            margin-bottom: 4rem;
-        }
-
-        /* =========================================
-           4. Component Styles
-           ========================================= */
-
-        /* Header (Hero Section) */
-        .hero-section {
-            height: 90vh; /* 화면 가득 채움 */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-
-        .hero-name {
-            font-size: 5rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #1d1d1f 0%, #434344 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-        }
-
-        .hero-role {
-            font-size: 2rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-            margin-bottom: 3rem;
-        }
-
-        .hero-contact a {
-            color: var(--accent-color);
-            text-decoration: none;
-            font-size: 1.1rem;
-            margin: 0 10px;
-            font-weight: 500;
-            transition: opacity 0.2s;
-        }
-        .hero-contact a:hover { opacity: 0.7; }
-
-        /* Card Style (공통) */
-        .info-card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
-            margin-bottom: 30px;
-            border: 1px solid rgba(0,0,0,0.02);
-        }
-
-        /* Key Roles (Highlight) */
-        .key-role-text {
-            font-size: 1.6rem;
-            font-weight: 600;
-            line-height: 1.4;
-            color: #1d1d1f;
-        }
-        .key-role-icon { color: var(--accent-color); margin-right: 15px; }
-
-        /* Skills (Chips) */
-        .skill-group-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: var(--text-primary);
-        }
-        .skill-chip {
-            display: inline-block;
-            background: #f5f5f7;
-            color: #1d1d1f;
-            padding: 10px 18px;
-            border-radius: 30px;
-            font-size: 1rem;
-            font-weight: 500;
-            margin: 0 8px 12px 0;
-            transition: transform 0.2s;
-        }
-        .skill-chip:hover {
-            transform: scale(1.05);
-            background: #e8e8ed;
-        }
-
-        /* Experience (Timeline-ish) */
-        .company-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #f5f5f7;
-            padding-bottom: 20px;
-        }
-        .company-name { font-size: 2.2rem; font-weight: 800; }
-        .company-type { background: #1d1d1f; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; vertical-align: middle; margin-left: 10px; }
-
-        .project-block { margin-top: 40px; }
-        .project-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 5px; }
-        .project-period { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 15px; display: block;}
-
-        .meta-group { margin-top: 20px; padding-left: 20px; border-left: 3px solid var(--accent-color); }
-        .meta-label { font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block; }
-        .meta-content { font-size: 1.05rem; line-height: 1.6; color: #333; white-space: pre-line; margin-bottom: 20px; }
-
-        /* Tech Stack */
-        .tech-badge {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--accent-color);
-            background: rgba(0, 102, 204, 0.1);
-            padding: 4px 10px;
-            border-radius: 8px;
-            margin-right: 5px;
-        }
-
-        /* Detail Items (Episode) */
-        .episode-box { background: #fafafa; border-radius: 12px; padding: 20px; margin-top: 15px; }
-        .episode-title { font-weight: 700; margin-bottom: 10px; }
-        .detail-li { margin-bottom: 6px; font-size: 1rem; position: relative; padding-left: 15px; }
-        .detail-li::before { content: "•"; position: absolute; left: 0; color: var(--text-secondary); }
-        .impact-li { color: #008844; font-weight: 600; }
-
-        /* Education & Certs */
-        .edu-item, .cert-item { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-        .edu-item:last-child { border-bottom: none; }
-        .item-main { font-weight: 600; font-size: 1.1rem; }
-        .item-sub { color: var(--text-secondary); font-size: 0.95rem; }
-
-    </style>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-
-<section class="hero-section reveal-on-scroll">
-    <div class="container-narrow">
-        <h1 class="hero-name" th:text="${profile.config.fullName}">Name</h1>
-        <div class="hero-role" th:text="${profile.config.companyRoleLabel}">Job Title</div>
-
-        <div class="hero-contact mt-4">
-            <a th:if="${profile.config.phone}" href="#" th:text="${profile.config.phone}"><i class="bi bi-telephone"></i></a>
-            <a th:if="${profile.config.email}" th:href="'mailto:' + ${profile.config.email}" th:text="${profile.config.email}"><i class="bi bi-envelope"></i></a>
-            <a th:if="${profile.config.github}" th:href="${profile.config.github}" target="_blank">GitHub <i class="bi bi-arrow-up-right"></i></a>
-        </div>
-
-        <div style="margin-top: 100px; opacity: 0.5; animation: bounce 2s infinite;">
-            <i class="bi bi-chevron-down fs-3"></i>
-        </div>
-    </div>
-</section>
 
 <th:block th:each="sec : ${profile.sections}">
 
     <section class="section-block" th:if="${sec.sectionType.name() == 'ABOUT'}">
         <div class="container-narrow">
+
+            <div class="text-center mb-5 reveal-on-scroll">
+                <h1 class="hero-name" th:text="${profile.config.fullName}">Name</h1>
+                <div class="hero-role" th:text="${profile.config.companyRoleLabel}">Job Title</div>
+
+                <div class="hero-contact mt-4 d-flex justify-content-center align-items-center gap-3" id="contactArea">
+
+                    <a th:if="${profile.config.github}"
+                       th:href="${profile.config.github.startsWith('http') ? profile.config.github : 'https://' + profile.config.github}"
+                       target="_blank"
+                       class="text-decoration-none d-flex align-items-center"
+                       style="color: var(--text-primary); font-weight: 500; transition: opacity 0.2s;">
+                        <i class="bi bi-github fs-5 me-2"></i> GitHub
+                    </a>
+
+                    <span id="contactDivider" class="text-secondary opacity-25">|</span>
+
+                    <button id="revealBtn" class="btn btn-sm btn-outline-secondary rounded-pill px-3" th:data-id="${profile.profileId}" onclick="loadContactInfo(this)"> <i class="bi bi-person-lines-fill me-1"></i> Contact </button>
+
+                    <span id="noContactMsg" class="text-secondary small" style="display: none;">
+                        등록된 연락처가 없습니다.
+                    </span>
+
+                    <div id="realContactInfo" class="gap-3" style="display: none; opacity: 0; transition: opacity 0.5s;">
+
+                        <a href="#" id="phoneLink" class="text-decoration-none d-flex align-items-center" style="color: var(--text-secondary);">
+                            <i class="bi bi-telephone me-1"></i> <span id="phoneText"></span>
+                        </a>
+
+                        <a href="#" id="emailLink" class="text-decoration-none d-flex align-items-center" style="color: var(--text-secondary);">
+                            <i class="bi bi-envelope me-1"></i> <span id="emailText"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <div th:if="${profile.config.aboutParagraph != null}">
-                <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionName != null ? sec.sectionName : 'About Me'}">About Me</h2>
+                <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionType}">ABOUT</h2>
                 <div class="info-card reveal-on-scroll">
                     <p style="font-size: 1.3rem; line-height: 1.8; color: #444; white-space: pre-line;"
                        th:text="${profile.config.aboutParagraph}">자기소개</p>
@@ -242,7 +61,7 @@
             </div>
 
             <div th:if="${not #lists.isEmpty(profile.keyRoles)}" class="mt-5">
-                <h3 class="fw-bold mb-4 reveal-on-scroll" style="color:var(--text-secondary)">Key Highlights</h3>
+                <h3 class="fw-bold mb-4 reveal-on-scroll text-center" style="color:var(--text-secondary); font-size: 1.5rem;">Key Highlights</h3>
                 <div class="d-flex flex-column gap-4">
                     <div th:each="role : ${profile.keyRoles}" class="info-card reveal-on-scroll d-flex align-items-center">
                         <i class="bi bi-check-circle-fill key-role-icon fs-3"></i>
@@ -255,7 +74,7 @@
 
     <section class="section-block" th:if="${sec.sectionType.name() == 'SKILLS' and not #lists.isEmpty(profile.skillCategories)}">
         <div class="container-narrow">
-            <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionName != null ? sec.sectionName : 'Technical Skills'}">Skills</h2>
+            <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionType}">SKILLS</h2>
             <div class="info-card reveal-on-scroll">
                 <div th:each="cat : ${profile.skillCategories}" class="mb-4 reveal-on-scroll delay-100">
                     <div class="skill-group-title" th:text="${cat.name}">Category</div>
@@ -269,8 +88,7 @@
 
     <section class="section-block" th:if="${sec.sectionType.name() == 'PROJECTS' and not #lists.isEmpty(profile.companies)}">
         <div class="container-narrow">
-            <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionName != null ? sec.sectionName : 'Work Experience'}">Experience</h2>
-            <div class="section-subtitle reveal-on-scroll delay-100">Journey of building products</div>
+            <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionType}">PROJECTS</h2>
 
             <div th:each="comp : ${profile.companies}" class="reveal-on-scroll" style="margin-bottom: 120px;">
                 <div class="company-header">
@@ -312,7 +130,7 @@
 
     <section class="section-block" th:if="${sec.sectionType.name() == 'EDUCATION' and not #lists.isEmpty(profile.educations)}">
         <div class="container-narrow">
-            <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionName != null ? sec.sectionName : 'Education'}">Education</h2>
+            <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionType}">EDUCATION</h2>
             <div class="info-card reveal-on-scroll">
                 <div th:each="edu : ${profile.educations}" class="edu-item">
                     <div>
@@ -331,7 +149,7 @@
 
     <section class="section-block" th:if="${sec.sectionType.name() == 'CERTIFICATION' and not #lists.isEmpty(profile.certifications)}">
         <div class="container-narrow">
-            <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionName != null ? sec.sectionName : 'Certifications'}">Certifications</h2>
+            <h2 class="section-title reveal-on-scroll" th:text="${sec.sectionType}">CERTIFICATION</h2>
             <div class="info-card reveal-on-scroll">
                 <div th:each="cert : ${profile.certifications}" class="cert-item">
                     <div>
@@ -346,24 +164,13 @@
 
 </th:block>
 
-<section class="section-block" style="border-top: 1px solid #eee; background: #fff;">
-    <div class="container-narrow text-center text-secondary" style="font-size: 0.9rem; opacity: 0.6;">
+<section class="section-block" style="border-top: 1px solid #eee; background: #fff; padding: 50px 0;">
+    <div class="container-narrow text-center text-secondary footer-text">
         © <span th:text="${#calendars.format(#calendars.createNow(), 'yyyy')}">2025</span>
         <span th:text="${profile.config.fullName}">Name</span>. All rights reserved.
     </div>
 </section>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
-        const observerCallback = (entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('is-visible');
-            });
-        };
-        const observer = new IntersectionObserver(observerCallback, observerOptions);
-        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
-    });
-</script>
+<script th:src="@{/js/main.js}"></script>
 </body>
 </html>

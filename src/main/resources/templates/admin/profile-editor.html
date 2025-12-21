@@ -12,6 +12,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="fw-bold text-primary"><i class="bi bi-person-lines-fill"></i> 이력서 데이터 관리</h1>
+    <a href="/admin/profiles" class="btn btn-outline-secondary" target="_self">이력서 목록<i class="bi bi-box-arrow-up-right"></i></a>
     <a href="/" class="btn btn-outline-secondary" target="_blank">내 이력서 보기 <i class="bi bi-box-arrow-up-right"></i></a>
 </div>
 
@@ -20,7 +21,7 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 
-<form th:action="@{/admin/profile/save}" th:object="${wrapper}" method="post" id="profileForm">
+<form th:action="@{|/admin/profile/${profileId}/save|}" th:object="${wrapper}" method="post" id="profileForm">
 
     <div id="mainSectionList" class="sortable-list-root">
 

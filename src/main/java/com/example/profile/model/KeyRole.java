@@ -20,4 +20,8 @@ public class KeyRole {
     private int sortOrder;
     @Column(name = "is_visible", nullable = false)
     private boolean isVisible = true;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id")
+    private ProfileMaster profileMaster;
 }

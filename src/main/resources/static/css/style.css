@@ -1,0 +1,195 @@
+/* =========================================
+   1. Apple-style Typography & Base
+   ========================================= */
+:root {
+    --bg-color: #f5f5f7; /* Apple Light Gray */
+    --card-bg: #ffffff;
+    --text-primary: #1d1d1f;
+    --text-secondary: #86868b;
+    --accent-color: #0066cc; /* Apple Blue */
+    --transition-curve: cubic-bezier(0.165, 0.84, 0.44, 1); /* 부드러운 감속 */
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", "Noto Sans KR", sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+.container-narrow {
+    max-width: 800px; /* 읽기 편한 폭으로 제한 */
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* =========================================
+   2. Scroll Animations (The "Magic")
+   ========================================= */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(50px) scale(0.98);
+    transition: opacity 1s var(--transition-curve), transform 1s var(--transition-curve);
+    will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* 순차적 딜레이 */
+.delay-100 { transition-delay: 0.1s; }
+.delay-200 { transition-delay: 0.2s; }
+.delay-300 { transition-delay: 0.3s; }
+
+/* =========================================
+   3. Section Styling
+   ========================================= */
+.section-block {
+    padding: 100px 0;
+}
+
+.section-title {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 3rem;
+    color: var(--text-primary);
+    text-align: center;
+    /* (선택사항) 대문자가 너무 강하면 주석 해제해서 첫 글자만 대문자로 */
+    /* text-transform: capitalize; */
+}
+
+.section-subtitle {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-align: center;
+    margin-top: -2.5rem;
+    margin-bottom: 4rem;
+}
+
+/* =========================================
+   4. Component Styles
+   ========================================= */
+
+/* Hero Info (Center) */
+.hero-name {
+    font-size: 5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #1d1d1f 0%, #434344 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+
+.hero-role {
+    font-size: 2rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 3rem;
+}
+
+.hero-contact a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 1.1rem;
+    margin: 0 10px;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+.hero-contact a:hover { opacity: 0.7; }
+
+/* Card Style */
+.info-card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+    margin-bottom: 30px;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+/* Key Roles */
+.key-role-text {
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #1d1d1f;
+}
+.key-role-icon { color: var(--accent-color); margin-right: 15px; }
+
+/* Skills */
+.skill-group-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+.skill-chip {
+    display: inline-block;
+    background: #f5f5f7;
+    color: #1d1d1f;
+    padding: 10px 18px;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0 8px 12px 0;
+    transition: transform 0.2s;
+}
+.skill-chip:hover {
+    transform: scale(1.05);
+    background: #e8e8ed;
+}
+
+/* Experience */
+.company-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #f5f5f7;
+    padding-bottom: 20px;
+}
+.company-name { font-size: 2.2rem; font-weight: 800; }
+.company-type { background: #1d1d1f; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; vertical-align: middle; margin-left: 10px; }
+
+.project-block { margin-top: 40px; }
+.project-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 5px; }
+.project-period { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 15px; display: block;}
+
+.meta-group { margin-top: 20px; padding-left: 20px; border-left: 3px solid var(--accent-color); }
+.meta-label { font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block; }
+.meta-content { font-size: 1.05rem; line-height: 1.6; color: #333; white-space: pre-line; margin-bottom: 20px; }
+
+/* Tech Stack */
+.tech-badge {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    background: rgba(0, 102, 204, 0.1);
+    padding: 4px 10px;
+    border-radius: 8px;
+    margin-right: 5px;
+}
+
+/* Episodes */
+.episode-box { background: #fafafa; border-radius: 12px; padding: 20px; margin-top: 15px; }
+.episode-title { font-weight: 700; margin-bottom: 10px; }
+.detail-li { margin-bottom: 6px; font-size: 1rem; position: relative; padding-left: 15px; }
+.detail-li::before { content: "•"; position: absolute; left: 0; color: var(--text-secondary); }
+.impact-li { color: #008844; font-weight: 600; }
+
+/* Education & Certs */
+.edu-item, .cert-item { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+.edu-item:last-child { border-bottom: none; }
+.item-main { font-weight: 600; font-size: 1.1rem; }
+.item-sub { color: var(--text-secondary); font-size: 0.95rem; }
+
+/* Footer */
+.footer-text { font-size: 0.9rem; opacity: 0.6; }

@@ -18,6 +18,10 @@ public class SkillCategory {
 
     private boolean isVisible = true;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id")
+    private ProfileMaster profileMaster;
+
     // 카테고리 안에 포함된 스킬들
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("sortOrder ASC")

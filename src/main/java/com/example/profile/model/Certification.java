@@ -25,4 +25,8 @@ public class Certification {
 
     @Column(name = "is_visible")
     private boolean isVisible = true;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id")
+    private ProfileMaster profileMaster;
 }

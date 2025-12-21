@@ -22,4 +22,8 @@ public class ProfileConfig {
     private String aboutParagraph;
     @Column(name = "company_role_label")
     private String companyRoleLabel;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id")
+    private ProfileMaster profileMaster;
 }

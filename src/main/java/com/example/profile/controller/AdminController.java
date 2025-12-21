@@ -8,26 +8,46 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/admin/profile")
+@RequestMapping("/admin")
 @RequiredArgsConstructor // AdminProfileService 생성자 주입
 public class AdminController {
 
     private final AdminProfileService adminProfileService;
 
-    @GetMapping("/editor")
-    public String showProfileEditor(Model model) {
-        // 서비스에서 데이터 가져오기 (트랜잭션 처리됨)
-        ProfileWrapper wrapper = adminProfileService.getProfileData();
+    // 목록 페이지
+    @GetMapping("/profiles")
+    public String listProfiles(Model model) {
+        model.addAttribute("profiles", adminProfileService.getAllProfiles());
+        return "admin/profile-list";
+    }
 
+    // 신규 생성
+    @PostMapping("/profiles/create")
+    public String createProfile(@RequestParam String title) {
+        adminProfileService.createNewProfile(title);
+        return "redirect:/admin/profiles";
+    }
+
+    // 활성화 전환
+    @PostMapping("/profiles/{id}/active")
+    public String toggleActive(@PathVariable Long id) {
+        adminProfileService.setActiveProfile(id);
+        return "redirect:/admin/profiles";
+    }
+
+    // 수정 페이지 이동
+    @GetMapping("/profile/{id}")
+    public String editProfile(@PathVariable Long id, Model model) {
+        ProfileWrapper wrapper = adminProfileService.getProfileWrapper(id);
         model.addAttribute("wrapper", wrapper);
+        model.addAttribute("profileId", id); // form action URL용
         return "admin/profile-editor";
     }
 
-    @PostMapping("/save")
-    public String saveProfile(@ModelAttribute ProfileWrapper wrapper) {
-        // 서비스에 저장 요청 (필터링 및 트랜잭션 처리됨)
-        adminProfileService.saveProfile(wrapper);
-
-        return "redirect:/admin/profile/editor?saved=true";
+    // 저장
+    @PostMapping("/profile/{id}/save")
+    public String saveProfile(@PathVariable Long id, @ModelAttribute ProfileWrapper wrapper) {
+        adminProfileService.saveProfile(id, wrapper);
+        return "redirect:/admin/profile/" + id + "?saved=true";
     }
 }

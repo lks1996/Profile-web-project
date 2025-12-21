@@ -28,6 +28,10 @@ public class Company {
     @OrderBy("sortOrder ASC")
     private List<ProjectMaster> projects;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id")
+    private ProfileMaster profileMaster;
+
     public void establishRelationship() {
         if (this.projects != null) {
             this.projects.forEach(project -> {
