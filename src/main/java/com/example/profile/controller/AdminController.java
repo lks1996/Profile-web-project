@@ -50,4 +50,11 @@ public class AdminController {
         adminProfileService.saveProfile(id, wrapper);
         return "redirect:/admin/profile/" + id + "?saved=true";
     }
+
+    // 삭제 기능
+    @PostMapping("/profiles/{id}/delete")
+    public String deleteProfile(@PathVariable Long id) {
+        adminProfileService.deleteProfile(id);
+        return "redirect:/admin/profiles"; // 삭제 후 목록으로 리다이렉트
+    }
 }
