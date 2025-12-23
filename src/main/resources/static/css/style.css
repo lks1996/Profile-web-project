@@ -193,3 +193,148 @@ body {
 
 /* Footer */
 .footer-text { font-size: 0.9rem; opacity: 0.6; }
+
+
+/* =========================================
+   Mobile Optimization: Force Visibility
+   ========================================= */
+@media (max-width: 768px) {
+    /* 모바일 화면에서는 스크롤 애니메이션 무력화 -> 무조건 보이게 설정 */
+    .reveal-on-scroll,
+    .reveal-on-scroll.visible {
+        opacity: 1 !important;        /* 투명도 해제 (무조건 보임) */
+        transform: none !important;   /* 위치 이동 효과 제거 */
+        transition: none !important;  /* 서서히 나타나는 효과 제거 */
+        visibility: visible !important;
+    }
+}
+
+/* =========================================
+   Print (PDF) Optimized Style
+   ========================================= */
+@media print {
+
+    @page {
+        margin: 0;
+        size: auto; /* A4 자동 맞춤 */
+    }
+
+    body {
+        margin: 1.5cm 1.5cm 1.5cm 1.5cm !important; /* 상하좌우 여백 */
+    }
+
+    /* 1. 배경 제거 및 잉크 절약 (White Background) */
+    body, section, div, header, footer,
+    .section-block, .container-narrow {
+        background-color: #ffffff !important; /* 무조건 흰 배경 */
+        background-image: none !important;    /* 배경 이미지 제거 */
+        color: #000000 !important;            /* 글자 검은색 */
+    }
+
+    /* 이전에 넣었던 '배경색 강제 출력' 옵션 무력화 */
+    * {
+        -webkit-print-color-adjust: unset !important;
+        print-color-adjust: unset !important;
+    }
+
+    /* 2. 불필요한 요소 숨기기 */
+    /*.btn, #revealBtn, .no-print, button,*/
+    /*#contactDivider, #noContactMsg,*/
+    /*nav, footer {*/
+    /*    display: none !important;*/
+    /*}*/
+
+    /* 3. 폰트 크기 최적화 (A4 용지 기준) */
+    html, body {
+        font-size: 10pt !important;       /* 본문 기본 10pt (일반적인 문서 크기) */
+        line-height: 1.4 !important;      /* 줄간격 좁힘 */
+    }
+
+    h1, .hero-name {
+        font-size: 22pt !important;       /* 이름 크기 줄임 (너무 크지 않게) */
+        margin-bottom: 5px !important;
+        /*color: #000 !important;*/
+    }
+
+    .hero-role {
+        font-size: 12pt !important;
+        color: #444 !important;
+        margin-bottom: 10px !important;
+    }
+
+    h2.section-title {
+        font-size: 14pt !important;       /* 섹션 제목 (ABOUT, SKILLS...) */
+        margin-top: 20px !important;
+        margin-bottom: 10px !important;
+        border-bottom: 1px solid #000 !important; /* 구분선 추가로 깔끔하게 */
+        padding-bottom: 3px !important;
+    }
+
+    h3, .project-title {
+        font-size: 12pt !important;       /* 프로젝트 제목 */
+        font-weight: bold !important;
+        margin-top: 10px !important;
+        margin-bottom: 5px !important;
+    }
+
+    /* 4. 레이아웃 및 여백 압축 (종이 낭비 방지) */
+    .container, .container-narrow {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .section-block {
+        padding: 10px 0 !important;       /* 섹션 위아래 여백 대폭 축소 */
+        margin-bottom: 0 !important;
+    }
+
+    .info-card {
+        padding: 0 !important;            /* 카드 내부 여백 제거 */
+        margin-bottom: 10px !important;
+    }
+
+    /* 5. 연락처 정보 강제 노출 및 정렬 */
+    #realContactInfo {
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        justify-content: center;
+        gap: 15px !important; /* 간격 조절 */
+        font-size: 10pt !important;
+    }
+
+    #realContactInfo a {
+        text-decoration: none !important;
+        color: #000 !important;
+    }
+
+    /* 6. 아이콘 크기 조절 */
+    .bi {
+        font-size: 0.9em !important;
+        vertical-align: middle;
+    }
+
+    /* 7. 페이지 넘김 방지 (내용 잘림 방지) */
+    .project-block, .company-header, .edu-item, .cert-item {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    /* 8. 링크 주소 텍스트 출력 방지 (Bootstrap 기본 동작 무력화) */
+    a[href]:after {
+        content: none !important;
+    }
+
+    h1.hero-name,
+    .hero-name,
+    .hero-name span {
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important; /* 크롬/사파리 강제 적용 */
+        background: transparent !important;           /* 배경 투명하게 */
+        visibility: visible !important;               /* 숨김 해제 */
+        opacity: 1 !important;                        /* 투명도 해제 */
+        text-shadow: none !important;                 /* 그림자 제거 */
+    }
+}
