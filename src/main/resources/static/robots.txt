@@ -1,0 +1,14 @@
+User-agent: GPTBot          # OpenAI (ChatGPT) 크롤러
+Disallow: /
+
+User-agent: Google-Extended # 구글 AI (Gemini 등) 학습용 크롤러 (검색엔진은 허용)
+Disallow: /
+
+User-agent: CCBot           # Common Crawl (대부분의 LLM 학습 데이터로 쓰임)
+Disallow: /
+
+User-agent: ClaudeBot       # Anthropic (Claude) 크롤러
+Disallow: /
+
+User-agent: * # 그 외 모든 봇 (선택 사항 - 검색엔진 노출도 막힐 수 있음 주의)
+Allow: /

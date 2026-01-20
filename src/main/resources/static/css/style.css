@@ -317,10 +317,10 @@ body {
     }
 
     /* 7. 페이지 넘김 방지 (내용 잘림 방지) */
-    .project-block, .company-header, .edu-item, .cert-item {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
+    /*.project-block, .company-header, .edu-item, .cert-item {*/
+    /*    break-inside: avoid;*/
+    /*    page-break-inside: avoid;*/
+    /*}*/
 
     /* 8. 링크 주소 텍스트 출력 방지 (Bootstrap 기본 동작 무력화) */
     a[href]:after {
