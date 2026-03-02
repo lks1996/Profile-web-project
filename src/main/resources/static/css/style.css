@@ -337,4 +337,49 @@ body {
         opacity: 1 !important;                        /* 투명도 해제 */
         text-shadow: none !important;                 /* 그림자 제거 */
     }
+
+    /* =========================================
+       플로팅 결제 버튼 스타일
+    ========================================= */
+    .floating-coffee-btn {
+        position: fixed;   /* 스크롤을 해도 화면에 고정 */
+        bottom: 30px;      /* 하단에서 30px 띄움 */
+        right: 30px;       /* 우측에서 30px 띄움 */
+        z-index: 9999;     /* 다른 모든 요소보다 최상단에 배치 */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* 마우스 오버 시 살짝 떠오르는 애니메이션 */
+    .floating-coffee-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+    }
+
+    .floating-coffee-btn .btn {
+        padding: 10px 20px;
+        background-color: #212529; /* 다크 모던 톤 (필요시 수정) */
+        border: none;
+    }
+
+    /* --- 모바일 환경 대응 (화면 너비 768px 미만) --- */
+    @media (max-width: 767.98px) {
+        .floating-coffee-btn {
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .floating-coffee-btn .btn {
+            /* 텍스트가 사라지므로 완전한 원형(동그라미)으로 형태 변경 */
+            padding: 15px !important;
+            border-radius: 50% !important;
+            width: 60px;
+            height: 60px;
+            justify-content: center;
+        }
+
+        .floating-coffee-btn .coffee-icon {
+            margin: 0 !important;
+            font-size: 1.8rem !important; /* 아이콘 크기 살짝 확대 */
+        }
+    }
 }
