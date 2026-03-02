@@ -227,8 +227,8 @@ body {
     body, section, div, header, footer,
     .section-block, .container-narrow {
         background-color: #ffffff !important; /* 무조건 흰 배경 */
-        background-image: none !important;    /* 배경 이미지 제거 */
-        color: #000000 !important;            /* 글자 검은색 */
+        background-image: none !important; /* 배경 이미지 제거 */
+        color: #000000 !important; /* 글자 검은색 */
     }
 
     /* 이전에 넣었던 '배경색 강제 출력' 옵션 무력화 */
@@ -243,15 +243,14 @@ body {
     /*nav, footer {*/
     /*    display: none !important;*/
     /*}*/
-
     /* 3. 폰트 크기 최적화 (A4 용지 기준) */
     html, body {
-        font-size: 10pt !important;       /* 본문 기본 10pt (일반적인 문서 크기) */
-        line-height: 1.4 !important;      /* 줄간격 좁힘 */
+        font-size: 10pt !important; /* 본문 기본 10pt (일반적인 문서 크기) */
+        line-height: 1.4 !important; /* 줄간격 좁힘 */
     }
 
     h1, .hero-name {
-        font-size: 22pt !important;       /* 이름 크기 줄임 (너무 크지 않게) */
+        font-size: 22pt !important; /* 이름 크기 줄임 (너무 크지 않게) */
         margin-bottom: 5px !important;
         /*color: #000 !important;*/
     }
@@ -263,7 +262,7 @@ body {
     }
 
     h2.section-title {
-        font-size: 14pt !important;       /* 섹션 제목 (ABOUT, SKILLS...) */
+        font-size: 14pt !important; /* 섹션 제목 (ABOUT, SKILLS...) */
         margin-top: 20px !important;
         margin-bottom: 10px !important;
         border-bottom: 1px solid #000 !important; /* 구분선 추가로 깔끔하게 */
@@ -271,7 +270,7 @@ body {
     }
 
     h3, .project-title {
-        font-size: 12pt !important;       /* 프로젝트 제목 */
+        font-size: 12pt !important; /* 프로젝트 제목 */
         font-weight: bold !important;
         margin-top: 10px !important;
         margin-bottom: 5px !important;
@@ -286,12 +285,12 @@ body {
     }
 
     .section-block {
-        padding: 10px 0 !important;       /* 섹션 위아래 여백 대폭 축소 */
+        padding: 10px 0 !important; /* 섹션 위아래 여백 대폭 축소 */
         margin-bottom: 0 !important;
     }
 
     .info-card {
-        padding: 0 !important;            /* 카드 내부 여백 제거 */
+        padding: 0 !important; /* 카드 내부 여백 제거 */
         margin-bottom: 10px !important;
     }
 
@@ -321,7 +320,6 @@ body {
     /*    break-inside: avoid;*/
     /*    page-break-inside: avoid;*/
     /*}*/
-
     /* 8. 링크 주소 텍스트 출력 방지 (Bootstrap 기본 동작 무력화) */
     a[href]:after {
         content: none !important;
@@ -332,12 +330,12 @@ body {
     .hero-name span {
         color: #000000 !important;
         -webkit-text-fill-color: #000000 !important; /* 크롬/사파리 강제 적용 */
-        background: transparent !important;           /* 배경 투명하게 */
-        visibility: visible !important;               /* 숨김 해제 */
-        opacity: 1 !important;                        /* 투명도 해제 */
-        text-shadow: none !important;                 /* 그림자 제거 */
+        background: transparent !important; /* 배경 투명하게 */
+        visibility: visible !important; /* 숨김 해제 */
+        opacity: 1 !important; /* 투명도 해제 */
+        text-shadow: none !important; /* 그림자 제거 */
     }
-
+}
     /* =========================================
        플로팅 결제 버튼 스타일
     ========================================= */
@@ -382,4 +380,3 @@ body {
             font-size: 1.8rem !important; /* 아이콘 크기 살짝 확대 */
         }
     }
-}
