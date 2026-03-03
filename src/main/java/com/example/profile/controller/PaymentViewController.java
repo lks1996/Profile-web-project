@@ -3,6 +3,7 @@ package com.example.profile.controller;
 import com.example.profile.model.PaymentConfirmRequest;
 import com.example.profile.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentViewController {
 
     private final PaymentService paymentService;
@@ -30,6 +32,7 @@ public class PaymentViewController {
             paymentService.confirmTossPayment(request);
 
             // 3. 최종 승인까지 성공하면 모델에 메시지를 담아 성공 페이지 렌더링
+            log.warn("Somebody sent coffee for you!");
             model.addAttribute("message", "커피 선물 감사합니다! 결제가 성공적으로 완료되었습니다.");
             return "payment/success";
 

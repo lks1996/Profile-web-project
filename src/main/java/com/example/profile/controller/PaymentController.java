@@ -23,7 +23,7 @@ public class PaymentController {
         // 고유 주문번호(UUID) 생성.
         String newOrderId = UUID.randomUUID().toString();
 
-        OrderDTO newOrder = new OrderDTO(newOrderId, "격려의 커피 한 잔", 5000L);
+        OrderDTO newOrder = new OrderDTO(newOrderId, "격려의 커피 한 잔", 500L);
 
         // DB에 PENDING(대기) 상태로 저장.
         orderRepository.save(newOrder);
