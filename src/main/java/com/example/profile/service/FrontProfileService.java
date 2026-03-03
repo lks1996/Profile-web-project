@@ -21,12 +21,7 @@ public class FrontProfileService {
     public ProfileWrapper getPublicProfile() {
         ProfileWrapper wrapper = new ProfileWrapper();
 
-        // 1. 활성화된(Active) 이력서 찾기
-        // (만약 활성 이력서가 없으면 빈 껍데기 반환)
-        ProfileMaster activeProfile = masterRepo.findAll().stream()
-                .filter(ProfileMaster::isActive)
-                .findFirst()
-                .orElse(null);
+        ProfileMaster activeProfile = masterRepo.findByIsActiveTrue().orElse(null);
 
         if (activeProfile == null) {
             return wrapper; // 빈 객체 반환 (화면에 아무것도 안 나옴)
@@ -34,10 +29,6 @@ public class FrontProfileService {
 
         wrapper.setProfileId(activeProfile.getId());
         wrapper.setProfileTitle(activeProfile.getTitle());
-
-        // =====================================================================
-        // 여기서부터는 'activeProfile' 안에 있는 리스트만 꺼내서 필터링/정렬합니다.
-        // =====================================================================
 
         // 2. Config (1:1 관계이므로 바로 가져옴)
         wrapper.setConfig(activeProfile.getConfig());
