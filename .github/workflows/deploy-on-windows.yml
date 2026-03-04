@@ -31,6 +31,7 @@ jobs:
         run: |
           docker run -d --restart always `
           -p 8290:8290 `
+          --network portfolio-net `
           -v "C:\Projects\profile-web-project\config:/config" `
           --name profile-web-project-container `
-          profile-web-project --spring.config.location=file:/config/application.yml
+          profile-web-project --spring.config.location=file:/config/
