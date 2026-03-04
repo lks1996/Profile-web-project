@@ -4,6 +4,7 @@ import com.example.profile.dto.ProfileWrapper;
 import com.example.profile.model.*;
 import com.example.profile.repository.ProfileMasterRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ public class FrontProfileService {
 
     private final ProfileMasterRepository masterRepo;
 
+    @Cacheable(value = "portfolio", key = "'activeProfile'")
     public ProfileWrapper getPublicProfile() {
         ProfileWrapper wrapper = new ProfileWrapper();
 

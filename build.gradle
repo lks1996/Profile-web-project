@@ -37,6 +37,12 @@ dependencies {
 	// Bootstrap CSS/JS 파일을 WebJars 형태로 사용하기 위한 의존성
 	// WebJars는 정적 리소스를 라이브러리처럼 관리하게 해줍니다.
 	implementation 'org.webjars:bootstrap:5.3.3'
+
+	// Redis 통신을 위한 의존성
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	// Spring의 @Cacheable 어노테이션을 사용하기 위한 의존성
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'

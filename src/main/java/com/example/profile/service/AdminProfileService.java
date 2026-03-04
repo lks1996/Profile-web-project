@@ -4,6 +4,7 @@ import com.example.profile.dto.ProfileWrapper;
 import com.example.profile.model.*;
 import com.example.profile.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,6 +90,7 @@ public class AdminProfileService {
         return wrapper;
     }
 
+    @CacheEvict(value = "portfolio", key = "'activeProfile'")
     public void saveProfile(Long profileId, ProfileWrapper wrapper) {
         ProfileMaster master = masterRepo.findById(profileId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Profile ID"));
