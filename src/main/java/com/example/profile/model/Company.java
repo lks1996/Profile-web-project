@@ -1,5 +1,6 @@
 package com.example.profile.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -28,6 +29,7 @@ public class Company {
     @OrderBy("sortOrder ASC")
     private List<ProjectMaster> projects;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id")
     private ProfileMaster profileMaster;

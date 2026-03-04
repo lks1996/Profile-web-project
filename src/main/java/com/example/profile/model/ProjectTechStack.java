@@ -1,5 +1,6 @@
 package com.example.profile.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
@@ -14,6 +15,7 @@ public class ProjectTechStack {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "meta_id", nullable = false)
     private ProjectMeta projectMeta;

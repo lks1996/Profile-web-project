@@ -1,5 +1,6 @@
 package com.example.profile.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class KeyRole {
     @Column(name = "is_visible", nullable = false)
     private boolean isVisible = true;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id")
     private ProfileMaster profileMaster;

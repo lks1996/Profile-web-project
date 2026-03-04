@@ -52,6 +52,7 @@ public class AdminProfileService {
         masterRepo.save(profile);
     }
 
+    @CacheEvict(value = "portfolio", key = "'activeProfile'")
     public void setActiveProfile(Long profileId) {
         List<ProfileMaster> all = masterRepo.findAll();
         for (ProfileMaster p : all) {
@@ -465,18 +466,17 @@ public class AdminProfileService {
     }
 
     private Set<String> initDeepDataAndCollectTechs(List<Company> companies) {
-        // (기존과 동일하므로 생략하지 않고 그대로 둡니다. 코드 일관성을 위해)
         Set<String> techs = new HashSet<>();
         if (companies == null) return techs;
         for (Company comp : companies) {
             if (comp.getProjects() != null) {
-                comp.getProjects().size();
+//                comp.getProjects().size();
                 for (ProjectMaster proj : comp.getProjects()) {
                     if (proj.getMetaItems() != null) {
-                        proj.getMetaItems().size();
+//                        proj.getMetaItems().size();
                         for (ProjectMeta meta : proj.getMetaItems()) {
                             if (meta.getTechStacks() != null) {
-                                meta.getTechStacks().size();
+//                                meta.getTechStacks().size();
                                 boolean isChainVisible = comp.isVisible() && proj.isVisible() && meta.isVisible();
                                 for (ProjectTechStack stack : meta.getTechStacks()) {
                                     if (isChainVisible && stack.isVisible() && !isEmpty(stack.getTechName())) {
@@ -485,7 +485,7 @@ public class AdminProfileService {
                                 }
                             }
                             if (meta.getProblems() != null) {
-                                meta.getProblems().size();
+//                                meta.getProblems().size();
                                 meta.getProblems().forEach(p -> {
                                     if(p.getSolutions()!=null) p.getSolutions().size();
                                     if(p.getImpacts()!=null) p.getImpacts().size();
@@ -512,7 +512,7 @@ public class AdminProfileService {
         return registered;
     }
 
-    // 이력서 삭제 (연관된 모든 데이터 Cascade 삭제)
+    @CacheEvict(value = "portfolio", key = "'activeProfile'")
     public void deleteProfile(Long profileId) {
         masterRepo.deleteById(profileId);
     }
