@@ -121,3 +121,12 @@ function loadContactInfo(btnElement) {
             alert('정보를 불러오는데 실패했습니다.');
         });
 }
+
+// 채팅창 여닫기 함수
+function toggleChatWindow() {
+    const chatWindow = document.getElementById('chat-window');
+    const chatBtn = document.getElementById('floating-chat-btn');
+
+    // hidden 클래스가 있으면 제거(열기), 없으면 추가(닫기)하는 논리
+    chatWindow.classList.toggle('hidden');
+}

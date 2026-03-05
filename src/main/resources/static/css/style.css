@@ -380,3 +380,206 @@ body {
             font-size: 1.8rem !important; /* 아이콘 크기 살짝 확대 */
         }
     }
+
+    /* =========================================
+       플로팅 AI 챗봇 버튼 스타일
+    ========================================= */
+/* ======================================================
+1. 최상위 컨테이너 (Flexbox를 활용한 우측 하단 정렬)
+====================================================== */
+#ai-chatbot-container {
+    position: fixed;
+    bottom: 90px; /* 결제(커피) 버튼 위로 안전하게 안착하는 높이 */
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* 모든 요소를 우측으로 정렬 */
+    gap: 15px; /* 채팅창과 버튼 사이의 논리적 간격 */
+    font-family: 'Malgun Gothic', sans-serif;
+}
+
+/* 토글(Toggle) 스위치 역할을 하는 핵심 클래스 */
+.hidden {
+    display: none !important;
+}
+
+/* ======================================================
+   2. 플로팅 알약 버튼 스타일
+   ====================================================== */
+#floating-chat-btn {
+    padding: 12px 24px;
+    border-radius: 30px; /* 알약 형태 */
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 아이콘과 글자 사이 간격 */
+    background-color: #007bff; /* 메인 테마 컬러 */
+    color: white;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+#floating-chat-btn:hover {
+    transform: scale(1.05);
+    background-color: #0056b3;
+}
+
+/* ======================================================
+   3. 채팅창 본체 레이아웃
+   ====================================================== */
+#chat-window {
+    width: 380px;
+    height: 600px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    /* CSS 애니메이션을 위한 트랜지션 준비 */
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.chat-header {
+    background-color: #f8f9fa;
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+}
+
+#close-chat-btn {
+    background: none;
+    border: none;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    color: #adb5bd;
+    transition: color 0.2s;
+}
+
+#close-chat-btn:hover {
+    color: #343a40;
+}
+
+.chat-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #f4f7f6;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* ======================================================
+   4. 메시지 말풍선 세부 스타일
+   ====================================================== */
+.message {
+    display: flex;
+    align-items: flex-start;
+}
+
+.message .text {
+    padding: 10px 16px;
+    border-radius: 12px;
+    max-width: 80%;
+    font-size: 14px;
+    line-height: 1.5;
+    word-break: break-word; /* 텍스트가 컨테이너를 뚫고 나가는 현상 방지 */
+}
+
+/* AI 아바타 메시지 */
+.message.model {
+    justify-content: flex-start;
+}
+
+.message.model .text {
+    background-color: white;
+    color: #333;
+    border-bottom-left-radius: 2px; /* 말풍선 꼬리 디테일 */
+    border: 1px solid #e9ecef;
+}
+
+/* 사용자 메시지 */
+.message.user {
+    justify-content: flex-end;
+}
+
+.message.user .text {
+    background-color: #007bff;
+    color: white;
+    border-bottom-right-radius: 2px;
+}
+
+/* ======================================================
+   5. 하단 입력창 및 전송 버튼
+   ====================================================== */
+.chat-footer {
+    padding: 15px;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    gap: 10px;
+    background-color: white;
+}
+
+#chat-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+#chat-input:focus {
+    border-color: #007bff;
+}
+
+#send-btn {
+    padding: 10px 18px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+#send-btn:hover {
+    background-color: #0056b3;
+}
+
+/* ======================================================
+   6. 모바일 환경 반응형 통제 (가로 768px 미만)
+   ====================================================== */
+@media (max-width: 767px) {
+    #ai-chatbot-container {
+        bottom: 80px; /* 모바일 결제 버튼 높이에 맞춰 조정 */
+        right: 15px;
+    }
+
+    #floating-chat-btn {
+        padding: 10px 18px;
+        font-size: 14px;
+    }
+
+    #chat-window {
+        width: calc(100vw - 30px);
+        height: 70vh;
+    }
+}

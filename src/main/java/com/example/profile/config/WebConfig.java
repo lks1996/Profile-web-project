@@ -10,11 +10,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     private final AdminAccessInterceptor adminAccessInterceptor;
+    private final ChatRateLimitInterceptor chatRateLimitInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(adminAccessInterceptor)
                 .addPathPatterns("/admin/**") // /admin 으로 시작하는 모든 URL 감시
+                .excludePathPatterns("/css/**", "/js/**", "/images/**"); // 정적 리소스는 제외
+
+        registry.addInterceptor(chatRateLimitInterceptor)
+                .addPathPatterns("/api/chat/**") // /admin 으로 시작하는 모든 URL 감시
                 .excludePathPatterns("/css/**", "/js/**", "/images/**"); // 정적 리소스는 제외
     }
 }
