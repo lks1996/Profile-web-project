@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import jakarta.servlet.DispatcherType;
 
 import java.time.Duration;
 import java.util.Map;
@@ -35,6 +36,12 @@ public class ChatRateLimitInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        // 비동기(SSE) 통신으로 인한 2차 내부 호출일 경우, 중복 검사 없이 즉시 통과.
+        if (DispatcherType.ASYNC.equals(request.getDispatcherType())) {
+            return true;
+        }
+
         String clientIp = request.getHeader("X-Forwarded-For");
         if (clientIp == null) clientIp = request.getRemoteAddr();
 

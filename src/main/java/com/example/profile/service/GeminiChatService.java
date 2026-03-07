@@ -64,12 +64,10 @@ public class GeminiChatService {
             requestBody.put("contents", contents);
 
             // 5. API 스트리밍 요청.
-            // String 대신 java.net.URI 객체를 직접 생성하여 WebClient의 자동 인코딩(%) 개입을 원천 차단합니다.
-            java.net.URI apiUri = java.net.URI.create("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent");
-
             return webClient.post()
-                    .uri(apiUri) // 가공되지 않은 순수 URI 주입
-                    .header("x-goog-api-key", geminiApiKey) // URL 파라미터 대신 안전한 전용 헤더 사용
+                    .uri("/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse")
+//                    .uri("/v1beta/models/gemini-3.1-flash-lite-preview:streamGenerateContent?alt=sse")
+                    .header("x-goog-api-key", geminiApiKey) // URL 대신 헤더에 안전하게 API 키 삽입
                     .bodyValue(requestBody)
                     .retrieve()
                     .bodyToFlux(String.class);

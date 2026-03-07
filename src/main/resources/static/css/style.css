@@ -2,12 +2,16 @@
    1. Apple-style Typography & Base
    ========================================= */
 :root {
-    --bg-color: #f5f5f7; /* Apple Light Gray */
+    --bg-color: #f5f5f7;
     --card-bg: #ffffff;
     --text-primary: #1d1d1f;
     --text-secondary: #86868b;
-    --accent-color: #0066cc; /* Apple Blue */
-    --transition-curve: cubic-bezier(0.165, 0.84, 0.44, 1); /* 부드러운 감속 */
+    --accent-color: #0066cc;
+    --transition-curve: cubic-bezier(0.165, 0.84, 0.44, 1);
+
+    --floating-transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    --floating-shadow-base: 0 4px 12px rgba(0,0,0,0.2);
+    --floating-shadow-hover: 0 10px 20px rgba(0,0,0,0.15);
 }
 
 body {
@@ -21,7 +25,7 @@ body {
 }
 
 .container-narrow {
-    max-width: 800px; /* 읽기 편한 폭으로 제한 */
+    max-width: 800px;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -41,7 +45,6 @@ body {
     transform: translateY(0) scale(1);
 }
 
-/* 순차적 딜레이 */
 .delay-100 { transition-delay: 0.1s; }
 .delay-200 { transition-delay: 0.2s; }
 .delay-300 { transition-delay: 0.3s; }
@@ -49,9 +52,7 @@ body {
 /* =========================================
    3. Section Styling
    ========================================= */
-.section-block {
-    padding: 100px 0;
-}
+.section-block { padding: 100px 0; }
 
 .section-title {
     font-size: 3rem;
@@ -60,8 +61,6 @@ body {
     margin-bottom: 3rem;
     color: var(--text-primary);
     text-align: center;
-    /* (선택사항) 대문자가 너무 강하면 주석 해제해서 첫 글자만 대문자로 */
-    /* text-transform: capitalize; */
 }
 
 .section-subtitle {
@@ -76,8 +75,6 @@ body {
 /* =========================================
    4. Component Styles
    ========================================= */
-
-/* Hero Info (Center) */
 .hero-name {
     font-size: 5rem;
     font-weight: 800;
@@ -88,12 +85,7 @@ body {
     margin-bottom: 1rem;
 }
 
-.hero-role {
-    font-size: 2rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-    margin-bottom: 3rem;
-}
+.hero-role { font-size: 2rem; color: var(--text-secondary); font-weight: 500; margin-bottom: 3rem; }
 
 .hero-contact a {
     color: var(--accent-color);
@@ -105,7 +97,6 @@ body {
 }
 .hero-contact a:hover { opacity: 0.7; }
 
-/* Card Style */
 .info-card {
     background: var(--card-bg);
     border-radius: 24px;
@@ -115,47 +106,17 @@ body {
     border: 1px solid rgba(0,0,0,0.02);
 }
 
-/* Key Roles */
-.key-role-text {
-    font-size: 1.6rem;
-    font-weight: 600;
-    line-height: 1.4;
-    color: #1d1d1f;
-}
+.key-role-text { font-size: 1.6rem; font-weight: 600; line-height: 1.4; color: #1d1d1f; }
 .key-role-icon { color: var(--accent-color); margin-right: 15px; }
 
-/* Skills */
-.skill-group-title {
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin-bottom: 15px;
-    color: var(--text-primary);
-}
+.skill-group-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 15px; color: var(--text-primary); }
 .skill-chip {
-    display: inline-block;
-    background: #f5f5f7;
-    color: #1d1d1f;
-    padding: 10px 18px;
-    border-radius: 30px;
-    font-size: 1rem;
-    font-weight: 500;
-    margin: 0 8px 12px 0;
-    transition: transform 0.2s;
+    display: inline-block; background: #f5f5f7; color: #1d1d1f; padding: 10px 18px;
+    border-radius: 30px; font-size: 1rem; font-weight: 500; margin: 0 8px 12px 0; transition: transform 0.2s;
 }
-.skill-chip:hover {
-    transform: scale(1.05);
-    background: #e8e8ed;
-}
+.skill-chip:hover { transform: scale(1.05); background: #e8e8ed; }
 
-/* Experience */
-.company-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 30px;
-    border-bottom: 2px solid #f5f5f7;
-    padding-bottom: 20px;
-}
+.company-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; border-bottom: 2px solid #f5f5f7; padding-bottom: 20px; }
 .company-name { font-size: 2.2rem; font-weight: 800; }
 .company-type { background: #1d1d1f; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; vertical-align: middle; margin-left: 10px; }
 
@@ -167,44 +128,26 @@ body {
 .meta-label { font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block; }
 .meta-content { font-size: 1.05rem; line-height: 1.6; color: #333; white-space: pre-line; margin-bottom: 20px; }
 
-/* Tech Stack */
-.tech-badge {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--accent-color);
-    background: rgba(0, 102, 204, 0.1);
-    padding: 4px 10px;
-    border-radius: 8px;
-    margin-right: 5px;
-}
+.tech-badge { font-size: 0.85rem; font-weight: 600; color: var(--accent-color); background: rgba(0, 102, 204, 0.1); padding: 4px 10px; border-radius: 8px; margin-right: 5px; }
 
-/* Episodes */
 .episode-box { background: #fafafa; border-radius: 12px; padding: 20px; margin-top: 15px; }
 .episode-title { font-weight: 700; margin-bottom: 10px; }
 .detail-li { margin-bottom: 6px; font-size: 1rem; position: relative; padding-left: 15px; }
 .detail-li::before { content: "•"; position: absolute; left: 0; color: var(--text-secondary); }
 .impact-li { color: #008844; font-weight: 600; }
 
-/* Education & Certs */
 .edu-item, .cert-item { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
 .edu-item:last-child { border-bottom: none; }
 .item-main { font-weight: 600; font-size: 1.1rem; }
 .item-sub { color: var(--text-secondary); font-size: 0.95rem; }
-
-/* Footer */
 .footer-text { font-size: 0.9rem; opacity: 0.6; }
 
-
-/* =========================================
-   Mobile Optimization: Force Visibility
-   ========================================= */
+/* 모바일 스크롤 애니메이션 강제 노출 */
 @media (max-width: 768px) {
-    /* 모바일 화면에서는 스크롤 애니메이션 무력화 -> 무조건 보이게 설정 */
-    .reveal-on-scroll,
-    .reveal-on-scroll.visible {
-        opacity: 1 !important;        /* 투명도 해제 (무조건 보임) */
-        transform: none !important;   /* 위치 이동 효과 제거 */
-        transition: none !important;  /* 서서히 나타나는 효과 제거 */
+    .reveal-on-scroll, .reveal-on-scroll.visible {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
         visibility: visible !important;
     }
 }
@@ -213,369 +156,131 @@ body {
    Print (PDF) Optimized Style
    ========================================= */
 @media print {
-
-    @page {
-        margin: 0;
-        size: auto; /* A4 자동 맞춤 */
-    }
-
-    body {
-        margin: 1.5cm 1.5cm 1.5cm 1.5cm !important; /* 상하좌우 여백 */
-    }
-
-    /* 1. 배경 제거 및 잉크 절약 (White Background) */
-    body, section, div, header, footer,
-    .section-block, .container-narrow {
-        background-color: #ffffff !important; /* 무조건 흰 배경 */
-        background-image: none !important; /* 배경 이미지 제거 */
-        color: #000000 !important; /* 글자 검은색 */
-    }
-
-    /* 이전에 넣었던 '배경색 강제 출력' 옵션 무력화 */
-    * {
-        -webkit-print-color-adjust: unset !important;
-        print-color-adjust: unset !important;
-    }
-
-    /* 2. 불필요한 요소 숨기기 */
-    /*.btn, #revealBtn, .no-print, button,*/
-    /*#contactDivider, #noContactMsg,*/
-    /*nav, footer {*/
-    /*    display: none !important;*/
-    /*}*/
-    /* 3. 폰트 크기 최적화 (A4 용지 기준) */
-    html, body {
-        font-size: 10pt !important; /* 본문 기본 10pt (일반적인 문서 크기) */
-        line-height: 1.4 !important; /* 줄간격 좁힘 */
-    }
-
-    h1, .hero-name {
-        font-size: 22pt !important; /* 이름 크기 줄임 (너무 크지 않게) */
-        margin-bottom: 5px !important;
-        /*color: #000 !important;*/
-    }
-
-    .hero-role {
-        font-size: 12pt !important;
-        color: #444 !important;
-        margin-bottom: 10px !important;
-    }
-
-    h2.section-title {
-        font-size: 14pt !important; /* 섹션 제목 (ABOUT, SKILLS...) */
-        margin-top: 20px !important;
-        margin-bottom: 10px !important;
-        border-bottom: 1px solid #000 !important; /* 구분선 추가로 깔끔하게 */
-        padding-bottom: 3px !important;
-    }
-
-    h3, .project-title {
-        font-size: 12pt !important; /* 프로젝트 제목 */
-        font-weight: bold !important;
-        margin-top: 10px !important;
-        margin-bottom: 5px !important;
-    }
-
-    /* 4. 레이아웃 및 여백 압축 (종이 낭비 방지) */
-    .container, .container-narrow {
-        max-width: 100% !important;
-        width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
-    .section-block {
-        padding: 10px 0 !important; /* 섹션 위아래 여백 대폭 축소 */
-        margin-bottom: 0 !important;
-    }
-
-    .info-card {
-        padding: 0 !important; /* 카드 내부 여백 제거 */
-        margin-bottom: 10px !important;
-    }
-
-    /* 5. 연락처 정보 강제 노출 및 정렬 */
-    #realContactInfo {
-        display: flex !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        justify-content: center;
-        gap: 15px !important; /* 간격 조절 */
-        font-size: 10pt !important;
-    }
-
-    #realContactInfo a {
-        text-decoration: none !important;
-        color: #000 !important;
-    }
-
-    /* 6. 아이콘 크기 조절 */
-    .bi {
-        font-size: 0.9em !important;
-        vertical-align: middle;
-    }
-
-    /* 7. 페이지 넘김 방지 (내용 잘림 방지) */
-    /*.project-block, .company-header, .edu-item, .cert-item {*/
-    /*    break-inside: avoid;*/
-    /*    page-break-inside: avoid;*/
-    /*}*/
-    /* 8. 링크 주소 텍스트 출력 방지 (Bootstrap 기본 동작 무력화) */
-    a[href]:after {
-        content: none !important;
-    }
-
-    h1.hero-name,
-    .hero-name,
-    .hero-name span {
+    @page { margin: 0; size: auto; }
+    body { margin: 1.5cm !important; }
+    body, section, div, header, footer, .section-block, .container-narrow {
+        background-color: #ffffff !important;
+        background-image: none !important;
         color: #000000 !important;
-        -webkit-text-fill-color: #000000 !important; /* 크롬/사파리 강제 적용 */
-        background: transparent !important; /* 배경 투명하게 */
-        visibility: visible !important; /* 숨김 해제 */
-        opacity: 1 !important; /* 투명도 해제 */
-        text-shadow: none !important; /* 그림자 제거 */
     }
-}
-    /* =========================================
-       플로팅 결제 버튼 스타일
-    ========================================= */
-    .floating-coffee-btn {
-        position: fixed;   /* 스크롤을 해도 화면에 고정 */
-        bottom: 30px;      /* 하단에서 30px 띄움 */
-        right: 30px;       /* 우측에서 30px 띄움 */
-        z-index: 9999;     /* 다른 모든 요소보다 최상단에 배치 */
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    /* 마우스 오버 시 살짝 떠오르는 애니메이션 */
-    .floating-coffee-btn:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
-    }
-
-    .floating-coffee-btn .btn {
-        padding: 10px 20px;
-        background-color: #212529; /* 다크 모던 톤 (필요시 수정) */
-        border: none;
-    }
-
-    /* --- 모바일 환경 대응 (화면 너비 768px 미만) --- */
-    @media (max-width: 767.98px) {
-        .floating-coffee-btn {
-            bottom: 20px;
-            right: 20px;
-        }
-
-        .floating-coffee-btn .btn {
-            /* 텍스트가 사라지므로 완전한 원형(동그라미)으로 형태 변경 */
-            padding: 15px !important;
-            border-radius: 50% !important;
-            width: 60px;
-            height: 60px;
-            justify-content: center;
-        }
-
-        .floating-coffee-btn .coffee-icon {
-            margin: 0 !important;
-            font-size: 1.8rem !important; /* 아이콘 크기 살짝 확대 */
-        }
-    }
-
-    /* =========================================
-       플로팅 AI 챗봇 버튼 스타일
-    ========================================= */
-/* ======================================================
-1. 최상위 컨테이너 (Flexbox를 활용한 우측 하단 정렬)
-====================================================== */
-#ai-chatbot-container {
-    position: fixed;
-    bottom: 90px; /* 결제(커피) 버튼 위로 안전하게 안착하는 높이 */
-    right: 20px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end; /* 모든 요소를 우측으로 정렬 */
-    gap: 15px; /* 채팅창과 버튼 사이의 논리적 간격 */
-    font-family: 'Malgun Gothic', sans-serif;
+    * { -webkit-print-color-adjust: unset !important; print-color-adjust: unset !important; }
+    html, body { font-size: 10pt !important; line-height: 1.4 !important; }
+    h1, .hero-name { font-size: 22pt !important; margin-bottom: 5px !important; }
+    .hero-role { font-size: 12pt !important; color: #444 !important; margin-bottom: 10px !important; }
+    h2.section-title { font-size: 14pt !important; margin-top: 20px !important; margin-bottom: 10px !important; border-bottom: 1px solid #000 !important; padding-bottom: 3px !important; }
+    h3, .project-title { font-size: 12pt !important; font-weight: bold !important; margin-top: 10px !important; margin-bottom: 5px !important; }
+    .container, .container-narrow { max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
+    .section-block { padding: 10px 0 !important; margin-bottom: 0 !important; }
+    .info-card { padding: 0 !important; margin-bottom: 10px !important; }
+    #realContactInfo { display: flex !important; opacity: 1 !important; visibility: visible !important; justify-content: center; gap: 15px !important; font-size: 10pt !important; }
+    #realContactInfo a { text-decoration: none !important; color: #000 !important; }
+    .bi { font-size: 0.9em !important; vertical-align: middle; }
+    a[href]:after { content: none !important; }
+    h1.hero-name, .hero-name, .hero-name span { color: #000000 !important; -webkit-text-fill-color: #000000 !important; background: transparent !important; visibility: visible !important; opacity: 1 !important; text-shadow: none !important; }
 }
 
-/* 토글(Toggle) 스위치 역할을 하는 핵심 클래스 */
-.hidden {
-    display: none !important;
-}
+/* =========================================
+   5. 플로팅 버튼 완벽 통합 CSS (절대 규격 강제)
+   ========================================= */
 
-/* ======================================================
-   2. 플로팅 알약 버튼 스타일
-   ====================================================== */
+/* 💡 핵심: 두 버튼의 공통 규격을 묶어서 한 번에 통제합니다. */
+.floating-coffee-btn .btn,
 #floating-chat-btn {
-    padding: 12px 24px;
-    border-radius: 30px; /* 알약 형태 */
-    display: flex;
-    align-items: center;
-    gap: 8px; /* 아이콘과 글자 사이 간격 */
-    background-color: #007bff; /* 메인 테마 컬러 */
-    color: white;
-    border: none;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    height: 50px !important; /* 높이를 픽셀로 강제 고정하여 외부 개입 차단 */
+    padding: 0 24px !important; /* 상하 여백은 0으로 두고, 높이에 맞춰 Flex로 수직 중앙 정렬 */
+    border-radius: 30px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    line-height: 1 !important; /* 부트스트랩의 줄간격(1.5) 상속을 무력화 */
+    border: none !important;
+    box-sizing: border-box !important;
+    box-shadow: var(--floating-shadow-base) !important;
+    transition: var(--floating-transition) !important;
+    cursor: pointer !important;
 }
 
+/* 마우스 오버 공통 효과 (위로 떠오름) */
+.floating-coffee-btn .btn:hover,
 #floating-chat-btn:hover {
-    transform: scale(1.05);
-    background-color: #0056b3;
+    transform: translateY(-5px) !important;
+    box-shadow: var(--floating-shadow-hover) !important;
 }
 
-/* ======================================================
-   3. 채팅창 본체 레이아웃
-   ====================================================== */
-#chat-window {
-    width: 380px;
-    height: 600px;
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.25);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    /* CSS 애니메이션을 위한 트랜지션 준비 */
-    transition: opacity 0.3s ease, transform 0.3s ease;
+/* 1) 격려의 커피 선물 버튼 (색상 및 위치 개별 지정) */
+.floating-coffee-btn {
+    position: fixed !important;
+    bottom: 30px !important;
+    right: 30px !important;
+    z-index: 9999 !important;
+}
+.floating-coffee-btn .btn {
+    background-color: #212529 !important;
+    color: white !important;
+}
+.floating-coffee-btn .btn:hover {
+    background-color: #000000 !important;
 }
 
-.chat-header {
-    background-color: #f8f9fa;
-    padding: 15px 20px;
-    border-bottom: 1px solid #dee2e6;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* 2) AI 챗봇 컨테이너 및 버튼 (색상 및 위치 개별 지정) */
+#ai-chatbot-container {
+    position: fixed !important;
+    bottom: 95px !important; /* 커피버튼(30) + 높이(50) + 간격(15) */
+    right: 30px !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+}
+#floating-chat-btn {
+    background-color: #007bff !important;
+    color: white !important;
+}
+#floating-chat-btn:hover {
+    background-color: #0056b3 !important;
 }
 
-.chat-header h3 {
-    margin: 0;
-    font-size: 16px;
-    color: #333;
-    font-weight: bold;
-}
+/* 채팅창 내부 레이아웃 (기존 동일) */
+#chat-window { width: 380px; height: 600px; background-color: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.25); overflow: hidden; display: flex; flex-direction: column; transition: opacity 0.3s ease, transform 0.3s ease; }
+.chat-header { background-color: #f8f9fa; padding: 15px 20px; border-bottom: 1px solid #dee2e6; display: flex; justify-content: space-between; align-items: center; }
+.chat-header h3 { margin: 0; font-size: 16px; color: #333; font-weight: bold; }
+#close-chat-btn { background: none; border: none; font-size: 26px; line-height: 1; cursor: pointer; color: #adb5bd; transition: color 0.2s; }
+#close-chat-btn:hover { color: #343a40; }
+.chat-body { flex: 1; padding: 20px; overflow-y: auto; background-color: #f4f7f6; display: flex; flex-direction: column; gap: 15px; }
+.message { display: flex; align-items: flex-start; }
+.message .text { padding: 10px 16px; border-radius: 12px; max-width: 80%; font-size: 14px; line-height: 1.5; word-break: break-word; }
+.message.model { justify-content: flex-start; }
+.message.model .text { background-color: white; color: #333; border-bottom-left-radius: 2px; border: 1px solid #e9ecef; }
+.message.user { justify-content: flex-end; }
+.message.user .text { background-color: #007bff; color: white; border-bottom-right-radius: 2px; }
+.chat-footer { padding: 15px; border-top: 1px solid #dee2e6; display: flex; gap: 10px; background-color: white; }
+.hidden { display: none !important; }
+#chat-input { flex: 1; padding: 10px 15px; border: 1px solid #dee2e6; border-radius: 8px; outline: none; font-size: 14px; transition: border-color 0.2s; }
+#chat-input:focus { border-color: #007bff; }
+#send-btn { padding: 10px 18px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background-color 0.2s; }
+#send-btn:hover { background-color: #0056b3; }
 
-#close-chat-btn {
-    background: none;
-    border: none;
-    font-size: 26px;
-    line-height: 1;
-    cursor: pointer;
-    color: #adb5bd;
-    transition: color 0.2s;
-}
-
-#close-chat-btn:hover {
-    color: #343a40;
-}
-
-.chat-body {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    background-color: #f4f7f6;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-/* ======================================================
-   4. 메시지 말풍선 세부 스타일
-   ====================================================== */
-.message {
-    display: flex;
-    align-items: flex-start;
-}
-
-.message .text {
-    padding: 10px 16px;
-    border-radius: 12px;
-    max-width: 80%;
-    font-size: 14px;
-    line-height: 1.5;
-    word-break: break-word; /* 텍스트가 컨테이너를 뚫고 나가는 현상 방지 */
-}
-
-/* AI 아바타 메시지 */
-.message.model {
-    justify-content: flex-start;
-}
-
-.message.model .text {
-    background-color: white;
-    color: #333;
-    border-bottom-left-radius: 2px; /* 말풍선 꼬리 디테일 */
-    border: 1px solid #e9ecef;
-}
-
-/* 사용자 메시지 */
-.message.user {
-    justify-content: flex-end;
-}
-
-.message.user .text {
-    background-color: #007bff;
-    color: white;
-    border-bottom-right-radius: 2px;
-}
-
-/* ======================================================
-   5. 하단 입력창 및 전송 버튼
-   ====================================================== */
-.chat-footer {
-    padding: 15px;
-    border-top: 1px solid #dee2e6;
-    display: flex;
-    gap: 10px;
-    background-color: white;
-}
-
-#chat-input {
-    flex: 1;
-    padding: 10px 15px;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    outline: none;
-    font-size: 14px;
-    transition: border-color 0.2s;
-}
-
-#chat-input:focus {
-    border-color: #007bff;
-}
-
-#send-btn {
-    padding: 10px 18px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s;
-}
-
-#send-btn:hover {
-    background-color: #0056b3;
-}
-
-/* ======================================================
-   6. 모바일 환경 반응형 통제 (가로 768px 미만)
-   ====================================================== */
+/* 3) 모바일 환경 반응형 통제 (가로 768px 미만) */
 @media (max-width: 767px) {
-    #ai-chatbot-container {
-        bottom: 80px; /* 모바일 결제 버튼 높이에 맞춰 조정 */
-        right: 15px;
+    /* 모바일에서도 두 버튼의 크기(높이)를 강제 일치시킵니다. */
+    .floating-coffee-btn .btn,
+    #floating-chat-btn {
+        height: 42px !important;
+        padding: 0 16px !important;
+        font-size: 14px !important;
     }
 
-    #floating-chat-btn {
-        padding: 10px 18px;
-        font-size: 14px;
+    .floating-coffee-btn {
+        bottom: 20px !important;
+        right: 20px !important;
+    }
+
+    #ai-chatbot-container {
+        bottom: 75px !important; /* 커피버튼(20) + 높이(42) + 간격(13) */
+        right: 20px !important;
     }
 
     #chat-window {
