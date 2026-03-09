@@ -65,8 +65,8 @@ public class GeminiChatService {
 
             // 5. API 스트리밍 요청.
             return webClient.post()
-                    .uri("/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse")
-//                    .uri("/v1beta/models/gemini-3.1-flash-lite-preview:streamGenerateContent?alt=sse")
+//                    .uri("/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse")
+                    .uri("/v1beta/models/gemini-3.1-flash-lite-preview:streamGenerateContent?alt=sse")
                     .header("x-goog-api-key", geminiApiKey) // URL 대신 헤더에 안전하게 API 키 삽입
                     .bodyValue(requestBody)
                     .retrieve()
